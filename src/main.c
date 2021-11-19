@@ -201,6 +201,34 @@ cfun_end_of_buffer(int32_t argc, Janet *argv) {
   return janet_wrap_false();
 }
 
+/* insert a character into the buffer */
+static Janet
+cfun_insert_char(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 2);
+
+  VoidPad *vp = ((VoidPad *) janet_getabstract(argv, 0, &VPad));
+  char uchar = janet_getinteger(argv, 1);
+
+  if (insert_char(vp, uchar))
+    return janet_wrap_true();
+
+  return janet_wrap_false();
+}
+
+/* insert a string into the buffer */
+static Janet
+cfun_insert_string(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 2);
+
+  VoidPad *vp = ((VoidPad *) janet_getabstract(argv, 0, &VPad));
+  const char *str = janet_getcstring(argv, 1);
+
+  if (insert_string(vp, str))
+    return janet_wrap_true();
+
+  return janet_wrap_false();
+}
+
 /* register functions */
 static JanetReg cfuns[] = {
   {"make-void-pad", cfun_make_void_pad, "Init a new void pad"},
@@ -218,6 +246,8 @@ static JanetReg cfuns[] = {
   {"vp-eolp", cfun_end_of_line, "end of line?"},
   {"vp-bobp", cfun_beginning_of_buffer, "beginning of buffer?"},
   {"vp-eobp", cfun_end_of_buffer, "end of buffer?"},
+  {"vp-insert-char", cfun_insert_char, "Insert character byte into buffer"},
+  {"vp-insert-string", cfun_insert_string, "Insert string into buffer"},
   {NULL, NULL, NULL}
 };
 

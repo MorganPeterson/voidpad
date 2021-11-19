@@ -208,8 +208,50 @@ beginning_of_buffer(VoidPad *vp) {
   return 0;
 }
 
-int end_of_buffer(VoidPad *vp) {
+int
+end_of_buffer(VoidPad *vp) {
   if (vp->pnt == vp->pnt_max)
     return 1;
   return 0;
 }
+
+int
+insert_char(VoidPad *vp, char c) {
+  if (vp->gap_size == 0) {
+    if (!grow(vp, vp->all_size << 1))
+      return 0;
+  }
+  vp->buf[vp->pnt] = c;
+  vp->pnt++;
+  vp->pnt_max++;
+  vp->gap_size--;
+  vp->gap_offset++;
+  vp->usr_size++;
+  return 1;
+}
+
+int
+insert_string(VoidPad *vp, const char *str) {
+  unsigned int len = strlen(str);
+  unsigned int spc = vp->gap_size;
+
+  if (len > spc) {
+    unsigned int all = vp->all_size << 1;
+    unsigned int sze = vp->all_size - spc;
+    
+    while(sze + len > all)
+      all <<= 1;
+
+    if(!grow(vp, all))
+      return 0;
+  }
+  memcpy(vp->buf + vp->gap_offset, str, len);
+  vp->gap_offset += len;
+  vp->pnt += len;
+  vp->pnt_max += len;
+  vp->gap_size -= len;
+  vp->gap_offset += len;
+  vp->usr_size += len;
+  return 1;
+}
+

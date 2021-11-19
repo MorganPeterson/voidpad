@@ -36,4 +36,5 @@ int beginning_of_line(VoidPad*);
 int end_of_line(VoidPad*);
 int beginning_of_buffer(VoidPad*);
 int end_of_buffer(VoidPad*);
-
+int insert_char(VoidPad*, char);
+int insert_string(VoidPad*, const char*);
