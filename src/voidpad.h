@@ -1,6 +1,21 @@
 #define DEFAULT_SIZE 4
 #define NEWLINE 10
 
+typedef struct {
+  uint8_t *buf;                       /* the buffer */
+  unsigned int pnt, pnt_min, pnt_max; /* where we are in the buffer */
+  unsigned int aft_offset;            /* after gap offset */
+  unsigned int gap_offset;            /* before gap offset */
+  unsigned int gap_size;              /* size of gap */
+  unsigned int all_size;              /* size allocated for buffer */
+  unsigned int usr_size;              /* size of text in buffer */
+} voidpad;
+
+static const JanetAbstractType voidpad_t = {
+  "voidpad/voidpad",
+  JANET_ATEND_NAME
+};
+
 /* utilities */
 void vp_free(voidpad*);
 

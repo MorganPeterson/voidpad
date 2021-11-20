@@ -3,7 +3,6 @@
 #include <string.h>
 #include <janet/janet.h>
 
-#include "types.h"
 #include "voidpad.h"
 
 static int grow(voidpad *vp, unsigned int newsize) {
@@ -21,29 +20,24 @@ static int grow(voidpad *vp, unsigned int newsize) {
 }
 
 void
-vp_free(voidpad *vp) {
-  free(vp->buf);
-  free(vp);
-}
-
-void
 create(voidpad* vp, unsigned int size) {
-  vp->buf = malloc(size + 1);
+  vp->buf = malloc(size);
   if (!vp->buf) {
     free(vp);
     janet_panicf("Unable to allocate buffer %d", size+1);
   }
 
-  vp->pnt_min = 0;
-  vp->pnt_max = 0;
-  vp->pnt = 0;
-  vp->aft_offset = size;
-  vp->gap_offset = 0;
+  for (int i=0; i<size;i++)
+    vp->buf[i] = '\0';
+
   vp->gap_size = size;
   vp->all_size = size;
+  vp->aft_offset = size;
+  vp->gap_offset = 0;
   vp->usr_size = 0;
-
-  vp->buf[size] = '\0';
+  vp->pnt_min = 0;
+  vp->pnt = vp->gap_offset;
+  vp->pnt_max = vp->pnt;
 }
 
 void
@@ -74,7 +68,7 @@ create_string(voidpad *vp, const char *str){
   vp->gap_size = dfs - len;
   vp->usr_size = len;
   vp->pnt_max = len;
-  vp->pnt = len;
+  vp->pnt = vp->gap_offset;
 }
 
 /* ************************************************************************* *
@@ -124,26 +118,35 @@ get_usr_size(voidpad *vp) {
 uint8_t
 char_after_pointer(voidpad *vp, unsigned int pnt) {
   ++pnt;
-  if (pnt > 0 && pnt <= vp->pnt_max) {
+  if (pnt >= vp->pnt_max) {
+    return vp->buf[pnt - 1];
+  } else if (pnt >= 0 && pnt <= vp->pnt_max) {
     if (pnt < vp->gap_offset)
       return vp->buf[pnt];
     else
       return vp->buf[vp->aft_offset + pnt];
   } else {
-    janet_panicf("pointer value not within text range: %d", pnt);
+    janet_panicf(
+        "pnt not in range. min:%d pnt:%d max:%d",
+        vp->pnt_min, pnt, vp->pnt_max);
   }
 }
 
 uint8_t
 char_before_pointer(voidpad *vp, unsigned int pnt) {
   --pnt;
-  if (pnt >= 0 && pnt < vp->pnt_max) {
-    if (pnt < vp->gap_offset)
+  if (pnt == -1) {
+    return vp->buf[0];
+  } else if (pnt >= 0 && pnt <= vp->pnt_max) {
+    if (pnt < vp->gap_offset) {
       return vp->buf[pnt];
-    else
+    } else {
       return vp->buf[vp->aft_offset + pnt];
+    }
   } else {
-    janet_panicf("pointer value not within text range: %d", pnt);
+    janet_panicf(
+        "pointer not in range. min:%d pnt:%d max:%d",
+        vp->pnt_min, pnt, vp->pnt_max);
   }
 }
 

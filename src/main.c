@@ -1,7 +1,6 @@
 #include <janet/janet.h>
 #include <string.h>
 
-#include "types.h"
 #include "voidpad.h"
 
 /* create a new gap buffer given a :keyword and optional argv*/
@@ -116,7 +115,7 @@ cfun_vp_char_after_pointer(int32_t argc, Janet *argv) {
 
   uint8_t result = char_after_pointer(vp, pointer);
   
-  return janet_wrap_string(&result);
+  return janet_wrap_integer(result);
 }
 
 /* get char before point */
@@ -126,10 +125,9 @@ cfun_vp_char_before_pointer(int32_t argc, Janet *argv) {
   
   voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
   unsigned int pointer = janet_optinteger(argv, argc, 1, get_point(vp));
-
   uint8_t result = char_before_pointer(vp, pointer);
   
-  return janet_wrap_string(&result);
+  return janet_wrap_integer(result);
 }
 
 /* is point given the beginning of a line? */
@@ -224,7 +222,7 @@ static JanetReg cfuns[] = {
   {"vp-point-max", cfun_vp_point_max, "Get current point max"},
   {"vp-aft-offset", cfun_vp_aft_offset, "Get current aft offset"},
   {"vp-gap-offset", cfun_vp_gap_offset, "Get current gap offset"},
-  {"vp-size", cfun_vp_all_size, "Get total size of gap and text"},
+  {"vp-all-size", cfun_vp_all_size, "Get total size of gap and text"},
   {"vp-gap-size", cfun_vp_gap_size, "Get size of the gap"},
   {"vp-usr-size", cfun_vp_usr_size, "Get the content size in the buffer"},
   {"vp-char-after", cfun_vp_char_after_pointer, "Get char after pointer"},
