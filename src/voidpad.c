@@ -5,36 +5,56 @@
 
 #include "voidpad.h"
 
-static int grow(voidpad *vp, unsigned int newsize) {
-  unsigned int len = vp->all_size - vp->aft_offset;
-  uint8_t *new_buf = realloc(vp->buf, newsize + 1);
-  if (!new_buf)
-    return 0;
-  new_buf[newsize] = '\0';
+void
+destroy(voidpad * vp) {
+  free(vp->buf);
+}
+
+void
+buffer_ensure(voidpad *vp, int32_t newsize) {
+  uint8_t *new_buf;
+  uint8_t *old_buf = vp->buf;
+  if (newsize <= vp->all_size) return;
+  new_buf = realloc(old_buf, (size_t)newsize * sizeof(uint8_t));
+  if (new_buf == NULL) {
+    destroy(vp);
+    free(vp);
+    janet_panic("out of memory");
+  }
   vp->buf = new_buf;
-  memmove(vp->buf + newsize - len, vp->buf + vp->aft_offset, len);
+  vp->all_size = newsize;
+}
+
+void
+grow(voidpad *vp, unsigned int newsize) {
+  unsigned int len = vp->all_size - vp->aft_offset;
+  buffer_ensure(vp, newsize);
+
+  uint8_t *zero = malloc(vp->all_size);
+  memset(zero, 0, newsize);
+  memmove(zero, vp->buf, vp->gap_offset);
+  memmove(zero + newsize - len, vp->buf + vp->aft_offset, len);
+
+  vp->buf = zero;
   vp->aft_offset = newsize - len;
   vp->gap_size += (newsize - vp->all_size);
-  vp->all_size = newsize;
-  return 1;
 }
 
 void
 create(voidpad* vp, unsigned int size) {
-  vp->buf = malloc(size);
+  if (size < DEFAULT_SIZE) size = DEFAULT_SIZE;
+  vp->buf = malloc(sizeof(uint8_t) * (size_t) size);
   if (!vp->buf) {
     free(vp);
-    janet_panicf("Unable to allocate buffer %d", size+1);
+    janet_panic("Out of memory");
   }
-
-  for (int i=0; i<size;i++)
-    vp->buf[i] = '\0';
+  /* fill empty spaces with null zero */
+  memset(vp->buf, 0, size);
 
   vp->gap_size = size;
   vp->all_size = size;
   vp->aft_offset = size;
   vp->gap_offset = 0;
-  vp->usr_size = 0;
   vp->pnt_min = 0;
   vp->pnt = vp->gap_offset;
   vp->pnt_max = vp->pnt;
@@ -66,7 +86,6 @@ create_string(voidpad *vp, const char *str){
   vp->aft_offset = dfs;
   vp->gap_offset = len;
   vp->gap_size = dfs - len;
-  vp->usr_size = len;
   vp->pnt_max = len;
   vp->pnt = vp->gap_offset;
 }
@@ -112,7 +131,7 @@ get_all_size(voidpad *vp) {
 
 unsigned int
 get_usr_size(voidpad *vp) {
-  return vp->usr_size;
+  return vp->all_size - vp->gap_size;
 }
 
 uint8_t
@@ -213,16 +232,14 @@ end_of_buffer(voidpad *vp) {
 
 int
 insert_char(voidpad *vp, char c) {
-  if (vp->gap_size == 0) {
-    if (!grow(vp, vp->all_size << 1))
-      return 0;
-  }
+  if (vp->gap_size == 0)
+    grow(vp, vp->all_size << 1);
+
   vp->buf[vp->pnt] = c;
   vp->pnt++;
   vp->pnt_max++;
   vp->gap_size--;
   vp->gap_offset++;
-  vp->usr_size++;
   return 1;
 }
 
@@ -234,12 +251,10 @@ insert_string(voidpad *vp, const char *str) {
   if (len > spc) {
     unsigned int all = vp->all_size << 1;
     unsigned int sze = vp->all_size - spc;
-    
     while(sze + len > all)
       all <<= 1;
-
-    if(!grow(vp, all))
-      return 0;
+    
+    grow(vp, all);
   }
   memcpy(vp->buf + vp->gap_offset, str, len);
   vp->gap_offset += len;
@@ -247,7 +262,6 @@ insert_string(voidpad *vp, const char *str) {
   vp->pnt_max += len;
   vp->gap_size -= len;
   vp->gap_offset += len;
-  vp->usr_size += len;
   return 1;
 }
 

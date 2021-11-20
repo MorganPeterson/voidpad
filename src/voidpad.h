@@ -8,7 +8,6 @@ typedef struct {
   unsigned int gap_offset;            /* before gap offset */
   unsigned int gap_size;              /* size of gap */
   unsigned int all_size;              /* size allocated for buffer */
-  unsigned int usr_size;              /* size of text in buffer */
 } voidpad;
 
 static const JanetAbstractType voidpad_t = {
