@@ -237,6 +237,5 @@ static JanetReg cfuns[] = {
 };
 
 JANET_MODULE_ENTRY(JanetTable *env) {
-  janet_register_abstract_type(&voidpad_t);
   janet_cfuns(env, "voidpad", cfuns);
 }
