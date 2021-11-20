@@ -15,5 +15,6 @@
 (declare-native
   :name "voidpad"
   :cflags cflags
-  :source ["src/main.c"])
+  :source ["src/voidpad.c"
+           "src/main.c"])
 

@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <janet/janet.h>
 
+#include "types.h"
 #include "voidpad.h"
 
-static int grow(VoidPad *vp, unsigned int newsize) {
+static int grow(voidpad *vp, unsigned int newsize) {
   unsigned int len = vp->all_size - vp->aft_offset;
-  char *new_buf = realloc(vp->buf, newsize + 1);
+  uint8_t *new_buf = realloc(vp->buf, newsize + 1);
   if (!new_buf)
     return 0;
   new_buf[newsize] = '\0';
@@ -19,22 +21,17 @@ static int grow(VoidPad *vp, unsigned int newsize) {
 }
 
 void
-vp_free(VoidPad *vp) {
+vp_free(voidpad *vp) {
   free(vp->buf);
   free(vp);
 }
 
-VoidPad *
-create(unsigned int size) {
-  VoidPad *vp = malloc(sizeof(VoidPad));
-  
-  if (!vp)
-    return NULL;
-
+void
+create(voidpad* vp, unsigned int size) {
   vp->buf = malloc(size + 1);
   if (!vp->buf) {
     free(vp);
-    return NULL;
+    janet_panicf("Unable to allocate buffer %d", size+1);
   }
 
   vp->pnt_min = 0;
@@ -47,31 +44,29 @@ create(unsigned int size) {
   vp->usr_size = 0;
 
   vp->buf[size] = '\0';
-
-  return vp;
 }
 
-VoidPad *
-create_empty() {
-  return create(DEFAULT_SIZE);
+void
+create_empty(voidpad* vp) {
+  return create(vp, DEFAULT_SIZE);
 }
 
-VoidPad *
-create_empty_size(unsigned int size) {
+void
+create_empty_size(voidpad *vp, unsigned int size) {
   if (size < DEFAULT_SIZE)
-    return create_empty();
+    return create_empty(vp);
 
-  return create(size);
+  return create(vp, size);
 }
 
-VoidPad *
-create_string(const char *str){
+void
+create_string(voidpad *vp, const char *str){
   unsigned int len = strlen(str);
   unsigned int dfs = DEFAULT_SIZE;
 
   while (dfs < len) dfs <<= 1;
 
-  VoidPad *vp = create(dfs);
+  create(vp, dfs);
   memcpy(vp->buf, str, len);
 
   vp->aft_offset = dfs;
@@ -80,8 +75,6 @@ create_string(const char *str){
   vp->usr_size = len;
   vp->pnt_max = len;
   vp->pnt = len;
-
-  return vp;
 }
 
 /* ************************************************************************* *
@@ -89,73 +82,73 @@ create_string(const char *str){
  * ************************************************************************* */
 
 unsigned int
-get_point(VoidPad *vp) {
+get_point(voidpad *vp) {
   return vp->pnt;
 }
 
 unsigned int
-get_point_min(VoidPad *vp) {
+get_point_min(voidpad *vp) {
   return vp->pnt_min;
 }
 
 unsigned int
-get_point_max(VoidPad *vp) {
+get_point_max(voidpad *vp) {
   return vp->pnt_max;
 }
 
 unsigned int
-get_aft_offset(VoidPad *vp) {
+get_aft_offset(voidpad *vp) {
   return vp->aft_offset;
 }
 
 unsigned int
-get_gap_offset(VoidPad *vp) {
+get_gap_offset(voidpad *vp) {
   return vp->gap_offset;
 }
 
 unsigned int
-get_gap_size(VoidPad *vp) {
+get_gap_size(voidpad *vp) {
   return vp->gap_size;
 }
 
 unsigned int
-get_all_size(VoidPad *vp) {
+get_all_size(voidpad *vp) {
   return vp->all_size;
 }
 
 unsigned int
-get_usr_size(VoidPad *vp) {
+get_usr_size(voidpad *vp) {
   return vp->usr_size;
 }
 
-char *
-char_after_pointer(VoidPad *vp, unsigned int pnt) {
+uint8_t
+char_after_pointer(voidpad *vp, unsigned int pnt) {
   ++pnt;
   if (pnt > 0 && pnt <= vp->pnt_max) {
     if (pnt < vp->gap_offset)
-      return &vp->buf[pnt];
+      return vp->buf[pnt];
     else
-      return &vp->buf[vp->aft_offset + pnt];
+      return vp->buf[vp->aft_offset + pnt];
   } else {
-    return NULL;
+    janet_panicf("pointer value not within text range: %d", pnt);
   }
 }
 
-char *
-char_before_pointer(VoidPad *vp, unsigned int pnt) {
+uint8_t
+char_before_pointer(voidpad *vp, unsigned int pnt) {
   --pnt;
   if (pnt >= 0 && pnt < vp->pnt_max) {
     if (pnt < vp->gap_offset)
-      return &vp->buf[pnt];
+      return vp->buf[pnt];
     else
-      return &vp->buf[vp->aft_offset + pnt];
+      return vp->buf[vp->aft_offset + pnt];
   } else {
-    return NULL;
+    janet_panicf("pointer value not within text range: %d", pnt);
   }
 }
 
 int
-beginning_of_line(VoidPad *vp) {
+beginning_of_line(voidpad *vp) {
   unsigned int pnt = vp->pnt;
 
   /* at beginning of text */
@@ -185,7 +178,7 @@ beginning_of_line(VoidPad *vp) {
 }
 
 int
-end_of_line(VoidPad *vp) {
+end_of_line(voidpad *vp) {
   unsigned int pnt = vp->pnt;
   /* at end of text */
   if (pnt == vp->pnt_max)
@@ -202,21 +195,21 @@ end_of_line(VoidPad *vp) {
 }
 
 int
-beginning_of_buffer(VoidPad *vp) {
+beginning_of_buffer(voidpad *vp) {
   if (vp->pnt == vp->pnt_min)
     return 1;
   return 0;
 }
 
 int
-end_of_buffer(VoidPad *vp) {
+end_of_buffer(voidpad *vp) {
   if (vp->pnt == vp->pnt_max)
     return 1;
   return 0;
 }
 
 int
-insert_char(VoidPad *vp, char c) {
+insert_char(voidpad *vp, char c) {
   if (vp->gap_size == 0) {
     if (!grow(vp, vp->all_size << 1))
       return 0;
@@ -231,7 +224,7 @@ insert_char(VoidPad *vp, char c) {
 }
 
 int
-insert_string(VoidPad *vp, const char *str) {
+insert_string(voidpad *vp, const char *str) {
   unsigned int len = strlen(str);
   unsigned int spc = vp->gap_size;
 
