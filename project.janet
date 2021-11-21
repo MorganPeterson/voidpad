@@ -15,8 +15,7 @@
 (declare-native
   :name "voidpad"
   :cflags cflags
-  :source ["src/utf8.c"
-           "src/buffer.c"
+  :source ["src/buffer.c"
            "src/queries.c"
            "src/munging.c"
            "src/main.c"])

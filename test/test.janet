@@ -74,4 +74,8 @@
 
 (test "munging"
   (expect (vp-insert-char buf3 100) true)
-  (expect (vp-insert-string buf3 "A fine day.") true))
+  (expect (vp-insert-string buf3 "A fine day.") true)
+  (expect (vp-delete-char buf3 1) 0)
+  (expect (vp-delete-char buf3 10) 0)
+  (expect (vp-delete-char buf3 -1) -1)
+  (expect (vp-delete-char buf3 -10) -10))

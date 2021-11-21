@@ -4,7 +4,11 @@
 #include "buffer.h"
 #include "queries.h"
 #include "munging.h"
-#include "main.h"
+
+static const JanetAbstractType voidpad_t = {
+  "voidpad/voidpad",
+  JANET_ATEND_NAME
+};
 
 /* create a new gap buffer given a :keyword and optional argv*/
 static Janet
@@ -217,6 +221,27 @@ cfun_insert_string(int32_t argc, Janet *argv) {
   return janet_wrap_false();
 }
 
+/* delete count chars from point. Negative is backspace. Positive is delete */
+static Janet
+cfun_delete_char(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 2);
+  voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
+  int count = janet_getinteger(argv, 1);
+
+  if (count < 0) {
+    for (int i=0; i > count; i--) {
+      if (!backspace_char(vp))
+        return janet_wrap_integer(i);
+    }
+  } else if (count > 0) {
+    for (int i=0; i < count; i++) {
+      if (!delete_char(vp))
+        return janet_wrap_integer(i);
+    }
+  }
+  return janet_wrap_integer(count);
+}
+
 /* register functions */
 static JanetReg cfuns[] = {
   {"make-void-pad", cfun_make_void_pad, "Init a new void pad"},
@@ -236,6 +261,7 @@ static JanetReg cfuns[] = {
   {"vp-eobp", cfun_end_of_buffer, "end of buffer?"},
   {"vp-insert-char", cfun_insert_char, "Insert character byte into buffer"},
   {"vp-insert-string", cfun_insert_string, "Insert string into buffer"},
+  {"vp-delete-char", cfun_delete_char, "Delete characters from buffer"},
   {NULL, NULL, NULL}
 };
 

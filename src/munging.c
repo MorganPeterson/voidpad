@@ -38,3 +38,30 @@ insert_string(voidpad *vp, const char *str) {
   return 1;
 }
 
+int
+backspace_char(voidpad *vp) {
+  if (vp->gap_offset > 0) {
+    vp->buf[vp->pnt] = 0;
+    vp->pnt--;
+    vp->pnt_max--;
+    vp->gap_offset--;
+    vp->gap_size++;
+  } else {
+    return 0;
+  }
+  return 1;
+}
+
+int
+delete_char(voidpad *vp) {
+  if (vp->aft_offset < vp->all_size) {
+    vp->buf[vp->aft_offset] = 0;
+    vp->pnt_max--;
+    vp->gap_size++;
+    vp->aft_offset++;
+  } else {
+    return 0;
+  }
+  return 1;
+}
+
