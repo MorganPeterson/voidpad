@@ -40,7 +40,7 @@ insert_string(voidpad *vp, const char *str) {
 
 int
 backspace_char(voidpad *vp) {
-  if (vp->gap_offset > 0) {
+  if (vp->pnt > 0) {
     vp->buf[vp->pnt] = 0;
     vp->pnt--;
     vp->pnt_max--;
@@ -65,3 +65,13 @@ delete_char(voidpad *vp) {
   return 1;
 }
 
+int
+erase_buf(voidpad *vp) {
+  memset(vp->buf, 0, vp->all_size * sizeof(uint8_t));
+  vp->pnt = 0;
+  vp->pnt_max = 0;
+  vp->aft_offset = vp->all_size;
+  vp->gap_offset = 0;
+  vp->gap_size = vp->all_size;
+  return 1;
+}

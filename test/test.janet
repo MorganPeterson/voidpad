@@ -78,4 +78,6 @@
   (expect (vp-delete-char buf3 1) 0)
   (expect (vp-delete-char buf3 10) 0)
   (expect (vp-delete-char buf3 -1) -1)
-  (expect (vp-delete-char buf3 -10) -10))
+  (expect (vp-delete-char buf3 -5) -5)
+  (expect (vp-delete-char buf3 -7) -6)
+  (expect (vp-erase buf4) true))

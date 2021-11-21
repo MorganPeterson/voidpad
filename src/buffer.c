@@ -30,7 +30,7 @@ grow(voidpad *vp, unsigned int newsize) {
   buffer_ensure(vp, newsize);
 
   uint8_t *zero = malloc(vp->all_size);
-  memset(zero, 0, newsize);
+  memset(zero, 0, newsize * sizeof(uint8_t));
   memmove(zero, vp->buf, vp->gap_offset);
   memmove(zero + newsize - len, vp->buf + vp->aft_offset, len);
 

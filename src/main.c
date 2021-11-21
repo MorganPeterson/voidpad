@@ -242,6 +242,16 @@ cfun_delete_char(int32_t argc, Janet *argv) {
   return janet_wrap_integer(count);
 }
 
+static Janet
+cfun_erase(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 1);
+  voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
+  if (erase_buf(vp))
+    return janet_wrap_true();
+
+  return janet_wrap_false();
+}
+
 /* register functions */
 static JanetReg cfuns[] = {
   {"make-void-pad", cfun_make_void_pad, "Init a new void pad"},
@@ -262,6 +272,7 @@ static JanetReg cfuns[] = {
   {"vp-insert-char", cfun_insert_char, "Insert character byte into buffer"},
   {"vp-insert-string", cfun_insert_string, "Insert string into buffer"},
   {"vp-delete-char", cfun_delete_char, "Delete characters from buffer"},
+  {"vp-erase", cfun_erase, "Erase entire buffer retaining size"},
   {NULL, NULL, NULL}
 };
 
