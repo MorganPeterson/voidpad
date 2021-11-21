@@ -72,3 +72,6 @@
   (expect (vp-eobp buf3) true)
   (expect (vp-eobp buf4) true))
 
+(test "munging"
+  (expect (vp-insert-char buf3 100) true)
+  (expect (vp-insert-string buf3 "A fine day.") true))

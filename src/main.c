@@ -1,7 +1,10 @@
 #include <janet/janet.h>
 #include <string.h>
 
-#include "voidpad.h"
+#include "buffer.h"
+#include "queries.h"
+#include "munging.h"
+#include "main.h"
 
 /* create a new gap buffer given a :keyword and optional argv*/
 static Janet
