@@ -18,5 +18,6 @@
   :source ["src/buffer.c"
            "src/queries.c"
            "src/munging.c"
+           "src/misc.c"
            "src/main.c"])
 

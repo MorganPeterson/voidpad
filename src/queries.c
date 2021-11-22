@@ -6,17 +6,17 @@
 
 unsigned int
 get_point(voidpad *vp) {
-  return vp->pnt;
+  return vp->gap_offset;
 }
 
 unsigned int
 get_point_min(voidpad *vp) {
-  return vp->pnt_min;
+  return 0;
 }
 
 unsigned int
 get_point_max(voidpad *vp) {
-  return vp->pnt_max;
+  return vp->size - (vp->aft_offset - vp->gap_offset);
 }
 
 unsigned int
@@ -31,42 +31,46 @@ get_gap_offset(voidpad *vp) {
 
 unsigned int
 get_gap_size(voidpad *vp) {
-  return vp->gap_size;
+  return vp->aft_offset - vp->gap_offset;
 }
 
 unsigned int
 get_all_size(voidpad *vp) {
-  return vp->all_size;
+  return vp->size;
 }
 
 unsigned int
 get_usr_size(voidpad *vp) {
-  return vp->all_size - vp->gap_size;
+  return vp->size - (vp->aft_offset - vp->gap_offset);
 }
 
 uint8_t
 char_after_pointer(voidpad *vp, unsigned int pnt) {
   ++pnt;
-  if (pnt >= vp->pnt_max) {
+  unsigned int pnt_max = get_point_max(vp);
+  unsigned int pnt_min = get_point_min(vp);
+  if (pnt >= pnt_max) {
     return vp->buf[pnt - 1];
-  } else if (pnt >= 0 && pnt <= vp->pnt_max) {
+  } else if (pnt >= 0 && pnt <= pnt_max) {
     if (pnt < vp->gap_offset)
       return vp->buf[pnt];
     else
       return vp->buf[vp->aft_offset + pnt];
   } else {
     janet_panicf(
-        "pnt not in range. min:%d pnt:%d max:%d",
-        vp->pnt_min, pnt, vp->pnt_max);
+        "point not in range. min:%d pnt:%d max:%d",
+        pnt_min, pnt, pnt_max);
   }
 }
 
 uint8_t
 char_before_pointer(voidpad *vp, unsigned int pnt) {
   --pnt;
+  unsigned int pnt_max = get_point_max(vp);
+  unsigned int pnt_min = get_point_min(vp);
   if (pnt == -1) {
     return vp->buf[0];
-  } else if (pnt >= 0 && pnt <= vp->pnt_max) {
+  } else if (pnt >= 0 && pnt <= pnt_max) {
     if (pnt < vp->gap_offset) {
       return vp->buf[pnt];
     } else {
@@ -75,16 +79,17 @@ char_before_pointer(voidpad *vp, unsigned int pnt) {
   } else {
     janet_panicf(
         "pointer not in range. min:%d pnt:%d max:%d",
-        vp->pnt_min, pnt, vp->pnt_max);
+        pnt_min, pnt, pnt_max);
   }
 }
 
 int
 beginning_of_line(voidpad *vp) {
-  unsigned int pnt = vp->pnt;
+  unsigned int pnt = get_point(vp);
+  unsigned int pnt_min = get_point_min(vp);
 
   /* at beginning of text */
-  if (pnt == vp->pnt_min)
+  if (pnt == pnt_min)
     return 1;
 
   /* test if before gap */
@@ -92,15 +97,14 @@ beginning_of_line(voidpad *vp) {
     if (vp->buf[pnt] == NEWLINE)
       return 0;
     --pnt;
-    if (pnt == vp->pnt_min || vp->buf[pnt] == NEWLINE)
+    if (pnt == pnt_min || vp->buf[pnt] == NEWLINE)
       return 1;
   } else {
     if (vp->buf[vp->aft_offset + pnt] == NEWLINE)
       return 0;
 
-    if (pnt == (vp->aft_offset - vp->gap_size)) {
-      if (vp->buf[pnt - 1] == NEWLINE)
-        return 1;
+    if (vp->buf[pnt - 1] == NEWLINE) {
+      return 1;
     } else {
       if (vp->buf[vp->aft_offset + pnt - 1] == NEWLINE)
         return 1;
@@ -111,9 +115,10 @@ beginning_of_line(voidpad *vp) {
 
 int
 end_of_line(voidpad *vp) {
-  unsigned int pnt = vp->pnt;
+  unsigned int pnt = get_point(vp);
+  unsigned int pnt_max = get_point_max(vp);
   /* at end of text */
-  if (pnt == vp->pnt_max)
+  if (pnt == pnt_max)
     return 1;
   
   if (pnt < vp->gap_offset) {
@@ -128,14 +133,18 @@ end_of_line(voidpad *vp) {
 
 int
 beginning_of_buffer(voidpad *vp) {
-  if (vp->pnt == vp->pnt_min)
+  unsigned int pnt = get_point(vp);
+  unsigned int pnt_min = get_point_min(vp);
+  if (pnt == pnt_min)
     return 1;
   return 0;
 }
 
 int
 end_of_buffer(voidpad *vp) {
-  if (vp->pnt == vp->pnt_max)
+  unsigned int pnt = get_point(vp);
+  unsigned int pnt_max = get_point_max(vp);
+  if (pnt == pnt_max)
     return 1;
   return 0;
 }

@@ -4,6 +4,7 @@
 #include "buffer.h"
 #include "queries.h"
 #include "munging.h"
+#include "misc.h"
 
 static const JanetAbstractType voidpad_t = {
   "voidpad/voidpad",
@@ -133,7 +134,6 @@ cfun_vp_char_before_pointer(int32_t argc, Janet *argv) {
   voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
   unsigned int pointer = janet_optinteger(argv, argc, 1, get_point(vp));
   uint8_t result = char_before_pointer(vp, pointer);
-  
   return janet_wrap_integer(result);
 }
 
@@ -243,6 +243,20 @@ cfun_delete_char(int32_t argc, Janet *argv) {
 }
 
 static Janet
+cfun_delete_region(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 3);
+
+  voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
+  int beg = janet_getinteger(argv, 1);
+  int end = janet_getinteger(argv, 2);
+
+  if (delete_region(vp, beg, end))
+    return janet_wrap_true();
+
+  return janet_wrap_false();
+}
+
+static Janet
 cfun_erase(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
   voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
@@ -250,6 +264,14 @@ cfun_erase(int32_t argc, Janet *argv) {
     return janet_wrap_true();
 
   return janet_wrap_false();
+}
+
+static Janet
+cfun_get_string(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 1);
+  voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
+  char *str = get_text(vp);
+  return janet_wrap_string(janet_cstring(str)); 
 }
 
 /* register functions */
@@ -272,7 +294,9 @@ static JanetReg cfuns[] = {
   {"vp-insert-char", cfun_insert_char, "Insert character byte into buffer"},
   {"vp-insert-string", cfun_insert_string, "Insert string into buffer"},
   {"vp-delete-char", cfun_delete_char, "Delete characters from buffer"},
+  {"vp-delete-region", cfun_delete_region, "Delete region from buffer"},
   {"vp-erase", cfun_erase, "Erase entire buffer retaining size"},
+  {"vp->string", cfun_get_string, "Return a string representing the text"},
   {NULL, NULL, NULL}
 };
 
