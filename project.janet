@@ -19,5 +19,6 @@
            "src/queries.c"
            "src/munging.c"
            "src/misc.c"
+           "src/move.c"
            "src/main.c"])
 

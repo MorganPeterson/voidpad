@@ -4,6 +4,7 @@
 #include "buffer.h"
 #include "queries.h"
 #include "munging.h"
+#include "move.h"
 #include "misc.h"
 
 static const JanetAbstractType voidpad_t = {
@@ -267,6 +268,54 @@ cfun_erase(int32_t argc, Janet *argv) {
 }
 
 static Janet
+cfun_goto_char(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 2);
+  voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
+  unsigned int n = janet_getinteger(argv, 1);
+
+  int result = goto_point(vp, n);
+  return janet_wrap_integer(result);
+}
+
+static Janet
+cfun_fwd_char(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 2);
+  voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
+  unsigned int n = janet_getinteger(argv, 1);
+
+  int result = move_forward_char(vp, n);
+  return janet_wrap_integer(result);
+}
+
+static Janet
+cfun_fwd_line(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 2);
+  voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
+  unsigned int n = janet_getinteger(argv, 1);
+
+  int result = move_forward_line(vp, n);
+  return janet_wrap_integer(result);
+}
+
+static Janet
+cfun_bol(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 1);
+  voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
+
+  int result = goto_bol(vp);
+  return janet_wrap_integer(result);
+}
+
+static Janet
+cfun_eol(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 1);
+  voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
+
+  int result = goto_eol(vp);
+  return janet_wrap_integer(result);
+}
+
+static Janet
 cfun_get_string(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
   voidpad *vp = janet_getabstract(argv, 0, &voidpad_t);
@@ -296,6 +345,11 @@ static JanetReg cfuns[] = {
   {"vp-delete-char", cfun_delete_char, "Delete characters from buffer"},
   {"vp-delete-region", cfun_delete_region, "Delete region from buffer"},
   {"vp-erase", cfun_erase, "Erase entire buffer retaining size"},
+  {"vp-goto-char", cfun_goto_char, "Go to new point n"},
+  {"vp-forward-char", cfun_fwd_char, "Pos n move forward n, neg n move backwards n"},
+  {"vp-forward-line", cfun_fwd_line, "Pos n move forward n, neg n move backwards n"},
+  {"vp-beginning-of-line", cfun_bol, "Move point to beginning of current line"},
+  {"vp-end-of-line", cfun_eol, "Move point to end of current line"},
   {"vp->string", cfun_get_string, "Return a string representing the text"},
   {NULL, NULL, NULL}
 };
