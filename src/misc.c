@@ -5,7 +5,7 @@
 #include "queries.h"
 
 char *
-get_text(voidpad *vp) {
+get_text(VoidPad *vp) {
   unsigned int pos = get_usr_size(vp);
   if(vp->gap_offset < pos) {
     unsigned int len = vp->gap_offset;

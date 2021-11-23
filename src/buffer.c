@@ -1,75 +1,55 @@
-#include <janet/janet.h>
-
 #include "buffer.h"
+#include "queries.h"
 
 #define DEFAULT_SIZE 4
 
 void
-create(voidpad* vp, unsigned int size) {
-  if (size < DEFAULT_SIZE) size = DEFAULT_SIZE;
-  vp->buf = malloc(sizeof(uint8_t) * (size_t) (size + 1));
-  if (!vp->buf) {
-    free(vp);
-    janet_panic("Out of memory");
-  }
-
-  memset(vp->buf, 0, size);
-  vp->size = size;
-  vp->aft_offset = size;
-  vp->gap_offset = 0;
+destroy(VoidPad* vp) {
+  janet_free(vp->buf);
 }
 
 void
-destroy(voidpad * vp) {
-  free(vp->buf);
-  free(vp);
-}
+create(VoidPad* vp, int32_t cap) {
+  uint8_t* buf = NULL;
+  if (cap < DEFAULT_SIZE) cap = DEFAULT_SIZE;
 
-void
-buffer_ensure(voidpad *vp, int32_t newsize) {
-  uint8_t *new_buf;
-  uint8_t *old_buf = vp->buf;
-  if (newsize <= vp->size) return;
-  new_buf = realloc(old_buf, (size_t)newsize * sizeof(uint8_t));
-  if (new_buf == NULL) {
+  buf = janet_malloc(sizeof(uint8_t) * (size_t) cap);
+  
+  if (buf == NULL) {
     destroy(vp);
     janet_panic("out of memory");
   }
-  vp->buf = new_buf;
-  vp->size = newsize;
+
+  memset(buf, 0, cap);
+  vp->size = cap;
+  vp->aft_offset = cap;
+  vp->gap_offset = 0;
+  vp->buf = buf;
 }
 
 void
-grow(voidpad *vp, unsigned int newsize) {
+grow(VoidPad *vp, int32_t n) {
+  int32_t gap_size = get_gap_size(vp);
+  if (n < gap_size)
+    return;
+
   unsigned int len = vp->size - vp->aft_offset;
-  buffer_ensure(vp, newsize);
-
-  uint8_t *zero = malloc(vp->size);
-  memset(zero, 0, newsize * sizeof(uint8_t));
-  memmove(zero, vp->buf, vp->gap_offset);
-  memmove(zero + newsize - len, vp->buf + vp->aft_offset, len);
-
-  vp->buf = zero;
-  vp->aft_offset = newsize - len;
+  n = (n + 1) * (size_t)sizeof(uint8_t);
+  uint8_t *newbuf = (uint8_t *)janet_realloc(vp->buf, n);
+  if(newbuf == NULL) {
+    destroy(vp);
+    janet_panic("Out of memory");
+  }
+  vp->buf = newbuf;
+  memmove(vp->buf + n - len, vp->buf + vp->aft_offset, len);
+  vp->aft_offset = n - len;
+  vp->size = n;
 }
 
 void
-create_empty(voidpad* vp) {
-  return create(vp, DEFAULT_SIZE);
-}
-
-void
-create_empty_size(voidpad *vp, unsigned int size) {
-  if (size < DEFAULT_SIZE)
-    return create_empty(vp);
-
-  return create(vp, size);
-}
-
-void
-create_string(voidpad *vp, const char *str){
-  unsigned int len = strlen(str);
-  unsigned int dfs = DEFAULT_SIZE;
+voidpad_init(VoidPad *vp, const char *str){
+  int32_t len = strlen(str);
+  int32_t dfs = DEFAULT_SIZE;
 
   while (dfs < len) dfs <<= 1;
 

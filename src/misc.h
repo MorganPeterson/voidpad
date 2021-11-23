@@ -1,2 +1,2 @@
-char *get_text(voidpad*);
+char *get_text(VoidPad*);
  

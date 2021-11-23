@@ -47,6 +47,7 @@ Interface consists of:
 (vp-insert-char buf byte)         # Insert byte at current pointer.
 (vp-insert-string buf str)        # Insert string at current pointer.
 (vp-delete-char buf n)            # Delete n bytes from pointer. (n delete, -n backspace)
+(vp-delete-region buf n m)        # Delete from n to m not including m.
 (vp-erase buf)                    # Delete entire buffer.
 (vp-goto-char buf n)              # Move pointer to n in the buffer.
 (vp-forward-char buf n)           # Move pointer n postions. (n to the right, -n to the left)
