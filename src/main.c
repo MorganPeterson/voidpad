@@ -289,8 +289,9 @@ cfun_bol(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
 
-  int result = goto_bol(vp);
-  return janet_wrap_integer(result);
+  if(goto_bol(vp))
+    return janet_wrap_true();
+  return janet_wrap_false();
 }
 
 static Janet
@@ -298,8 +299,9 @@ cfun_eol(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
 
-  int result = goto_eol(vp);
-  return janet_wrap_integer(result);
+  if(goto_eol(vp))
+    return janet_wrap_true();
+  return janet_wrap_false();
 }
 
 static Janet

@@ -7,11 +7,11 @@
 int
 goto_point(VoidPad *vp, unsigned int n) {
   unsigned int len = get_gap_size(vp);
-  if (n > vp->aft_offset - len)
-    n = vp->aft_offset - len;
+  if (n > vp->size - len)
+    n = vp->size - len;
   if (n < vp->gap_offset) {
     len = vp->gap_offset - n;
-    memmove(vp->buf + vp->aft_offset, vp->buf + n, len);
+    memmove(vp->buf + vp->aft_offset - len, vp->buf + n, len);
     vp->gap_offset -= len;
     vp->aft_offset -= len;
   } else {
@@ -129,9 +129,10 @@ goto_bol(VoidPad *vp) {
 int
 goto_eol(VoidPad *vp) {
   while (vp->aft_offset < vp->size) {
-    if (vp->buf[vp->aft_offset] == '\n')
-      break;
     vp->buf[vp->gap_offset++] = vp->buf[vp->aft_offset++];
+    if (vp->buf[vp->aft_offset] == '\n') {
+      break;
+    }
   }
   return 1;
 }

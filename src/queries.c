@@ -84,8 +84,8 @@ char_before_pointer(VoidPad *vp, unsigned int pnt) {
 
 int
 beginning_of_line(VoidPad *vp) {
-  unsigned int pnt = get_point(vp);
-  unsigned int pnt_min = get_point_min(vp);
+  int32_t pnt = get_point(vp);
+  int32_t pnt_min = get_point_min(vp);
 
   /* at beginning of text */
   if (pnt == pnt_min)
@@ -114,17 +114,19 @@ beginning_of_line(VoidPad *vp) {
 
 int
 end_of_line(VoidPad *vp) {
-  unsigned int pnt = get_point(vp);
-  unsigned int pnt_max = get_point_max(vp);
+  int32_t pnt = get_point(vp);
+  int32_t pnt_max = get_point_max(vp);
+  int32_t gs = get_gap_size(vp);
+
   /* at end of text */
   if (pnt == pnt_max)
     return 1;
-  
-  if (pnt < vp->gap_offset) {
-    if (vp->buf[pnt] == NEWLINE)
+ 
+  if (pnt <= vp->gap_offset) {
+    if (vp->buf[pnt + 1] == NEWLINE)
       return 1;
   } else {
-    if (vp->buf[vp->aft_offset + pnt] == NEWLINE)
+    if (vp->buf[pnt + gs] == NEWLINE)
       return 1;
   }
   return 0;
