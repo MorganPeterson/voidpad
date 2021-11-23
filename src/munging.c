@@ -17,11 +17,7 @@ int
 insert_string(VoidPad *vp, const char *str) {
   int32_t len = strlen(str);
   grow(vp, len);
-
-  printf("aft_offset -> %d\n", vp->aft_offset);
-  
   memcpy(vp->buf + vp->gap_offset, str, len);
-  
   vp->gap_offset += len;
   return 1;
 }

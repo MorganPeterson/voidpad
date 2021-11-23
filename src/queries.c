@@ -44,17 +44,16 @@ get_usr_size(VoidPad *vp) {
 
 uint8_t
 char_after_pointer(VoidPad *vp, unsigned int pnt) {
-  ++pnt;
   unsigned int pnt_max = get_point_max(vp);
   unsigned int pnt_min = get_point_min(vp);
-  if (pnt > pnt_max) {
+  if (pnt >= pnt_max) {
     return vp->buf[pnt_max];
-  } else if (pnt >= 0 && pnt <= pnt_max) {
-    if (pnt < vp->gap_offset) {
-      return vp->buf[pnt];
+  } else if (pnt >= 0 && pnt < pnt_max) {
+    if ((pnt + 1) < vp->gap_offset) {
+      return vp->buf[pnt + 1];
     } else {
-      printf("aft -> %d\n", vp->aft_offset);
-      return vp->buf[vp->aft_offset + (pnt - 1)];
+      uint32_t gs = get_gap_size(vp);
+      return vp->buf[pnt + gs];
     }
   } else {
     janet_panicf(
