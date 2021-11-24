@@ -11,3 +11,4 @@ typedef struct voidpad VoidPad;
 
 void grow(VoidPad*, int32_t);
 void voidpad_init(VoidPad*, const char*);
+void destroy(VoidPad*);

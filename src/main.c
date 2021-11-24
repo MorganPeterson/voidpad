@@ -312,9 +312,18 @@ cfun_get_string(int32_t argc, Janet *argv) {
   return janet_wrap_string(janet_cstring(str)); 
 }
 
+static Janet
+cfun_destroy(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 1);
+  VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
+  destroy(vp);
+  return janet_wrap_true();
+}
+
 /* register functions */
 static JanetReg cfuns[] = {
   {"make-void-pad", cfun_make_void_pad, "Init a new void pad"},
+  {"vp-destroy", cfun_destroy, "free() void pad"},
   {"vp-point", cfun_vp_point, "Get current point"},
   {"vp-point-min", cfun_vp_point_min, "Get current point min"},
   {"vp-point-max", cfun_vp_point_max, "Get current point max"},

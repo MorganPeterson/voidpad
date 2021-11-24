@@ -30,6 +30,7 @@ Interface consists of:
 (def arg ["a string" | 100 | nil])
 
 (make-void-pad buf keyword & arg) # Return a new Void Pad buffer
+(vp-destroy buf)                  # Free() Void Pad memory
 (vp-point buf)                    # Return current position of the pointer.
 (vp-point-min buf)                # Return min pointer position. Always 0.
 (vp-point-max buf)                # Return end of the text buffer position.
