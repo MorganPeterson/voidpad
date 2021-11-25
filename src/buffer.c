@@ -34,7 +34,7 @@ grow(VoidPad *vp, int32_t n) {
     return;
 
   unsigned int len = vp->size - vp->aft_offset;
-  n = (n + 1) * (size_t)sizeof(uint8_t);
+  n = (n + DEFAULT_SIZE) * (size_t)sizeof(uint8_t);
   uint8_t *newbuf = (uint8_t *)janet_realloc(vp->buf, n);
   if(newbuf == NULL) {
     destroy(vp);
@@ -42,8 +42,8 @@ grow(VoidPad *vp, int32_t n) {
   }
   vp->buf = newbuf;
   memmove(vp->buf + n - len, vp->buf + vp->aft_offset, len);
-  vp->aft_offset = n - len;
-  vp->size = n;
+  vp->aft_offset += n - len;
+  vp->size += n;
 }
 
 void

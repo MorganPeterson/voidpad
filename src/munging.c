@@ -8,8 +8,7 @@ int
 insert_char(VoidPad *vp, char c) {
   grow(vp, 1);
 
-  vp->buf[vp->gap_offset] = c;
-  vp->gap_offset++;
+  vp->buf[vp->gap_offset++] = c;
   return 1;
 }
 
