@@ -4,7 +4,7 @@
 
 int32_t
 get_gap_size(VoidPad *vp) {
-  return (vp->aft_offset - vp->gap_offset) + 1;
+  return vp->e - vp->s;
 }
 
 int32_t
@@ -15,7 +15,7 @@ get_usr_size(VoidPad *vp) {
 
 int32_t
 get_point(VoidPad *vp) {
-  return vp->gap_offset;
+  return vp->s;
 }
 
 int32_t
@@ -30,12 +30,12 @@ get_point_max(VoidPad *vp) {
 
 int32_t
 get_aft_offset(VoidPad *vp) {
-  return vp->aft_offset;
+  return vp->e;
 }
 
 int32_t
 get_gap_offset(VoidPad *vp) {
-  return vp->gap_offset;
+  return vp->s;
 }
 
 int32_t
@@ -50,7 +50,7 @@ char_after_pointer(VoidPad *vp, int32_t pnt) {
   if (pnt >= pnt_max) {
     return vp->buf[pnt_max];
   } else if (pnt >= 0 && pnt < pnt_max) {
-    if ((pnt + 1) < vp->gap_offset) {
+    if ((pnt + 1) < vp->s) {
       return vp->buf[pnt + 1];
     } else {
       int32_t gs = get_gap_size(vp);
@@ -71,10 +71,10 @@ char_before_pointer(VoidPad *vp, int32_t pnt) {
   if (pnt == -1) {
     return vp->buf[0];
   } else if (pnt >= 0 && pnt <= pnt_max) {
-    if (pnt < vp->gap_offset) {
+    if (pnt < vp->s) {
       return vp->buf[pnt];
     } else {
-      return vp->buf[vp->aft_offset + pnt];
+      return vp->buf[vp->e + pnt];
     }
   } else {
     janet_panicf(
@@ -93,20 +93,20 @@ beginning_of_line(VoidPad *vp) {
     return 1;
 
   /* test if before gap */
-  if (pnt < vp->gap_offset) {
+  if (pnt < vp->s) {
     if (vp->buf[pnt] == NEWLINE)
       return 0;
     --pnt;
     if (pnt == pnt_min || vp->buf[pnt] == NEWLINE)
       return 1;
   } else {
-    if (vp->buf[vp->aft_offset + pnt] == NEWLINE)
+    if (vp->buf[vp->e + pnt] == NEWLINE)
       return 0;
 
     if (vp->buf[pnt - 1] == NEWLINE) {
       return 1;
     } else {
-      if (vp->buf[vp->aft_offset + pnt - 1] == NEWLINE)
+      if (vp->buf[vp->e + pnt - 1] == NEWLINE)
         return 1;
     }
   }
@@ -123,7 +123,7 @@ end_of_line(VoidPad *vp) {
   if (pnt == pnt_max)
     return 1;
  
-  if (pnt <= vp->gap_offset) {
+  if (pnt <= vp->e) {
     if (vp->buf[pnt + 1] == NEWLINE)
       return 1;
   } else {

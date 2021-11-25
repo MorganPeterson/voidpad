@@ -1,14 +1,13 @@
 #include <janet/janet.h>
 
 struct voidpad {
-  uint8_t *buf;        /* the buffer */
-  int32_t size;        /* size allocated for buffer */
-  int32_t aft_offset;  /* after gap offset */
-  int32_t gap_offset;  /* before gap offset */
+  int8_t *buf;  /* the buffer */
+  int32_t size;  /* size allocated for buf */
+  int32_t s, e; /* start and end of gap buffer */
 };
 
 typedef struct voidpad VoidPad;
 
-void grow(VoidPad*, int32_t);
-void voidpad_init(VoidPad*, const char*);
+int32_t grow(VoidPad*, int32_t);
+int32_t voidpad_init(VoidPad*, const char*);
 void destroy(VoidPad*);

@@ -6,27 +6,28 @@
 
 int32_t
 goto_point(VoidPad *vp, int32_t n) {
-  int32_t len = get_gap_size(vp);
+  int32_t len = vp->e - vp->s;
   if (n > vp->size - len)
     n = vp->size - len;
-  if (n < vp->gap_offset) {
-    len = vp->gap_offset - n;
-    memmove(vp->buf + vp->aft_offset - len, vp->buf + n, len);
-    vp->gap_offset -= len;
-    vp->aft_offset -= len;
+
+  if (n < vp->s) {
+    len = vp->s - n;
+    memmove(vp->buf+vp->e-len, vp->buf+n, len);
+    vp->s -= len;
+    vp->e -= len;
   } else {
-    len = n - vp->gap_offset;
-    memmove(vp->buf + vp->gap_offset, vp->buf + vp->aft_offset, len);
-    vp->gap_offset += len;
-    vp->aft_offset += len;
+    len = n - vp->s;
+    memmove(vp->buf+vp->s, vp->buf+vp->e, len);
+    vp->s += len;
+    vp->e += len;
   }
-  return n;
+  return 1;
 }
 
 int32_t
 goto_left(VoidPad *vp) {
-  if (vp->gap_offset > 0) {
-    vp->buf[--vp->aft_offset] = vp->buf[--vp->gap_offset];
+  if (vp->s > 0) {
+    vp->buf[--vp->e] = vp->buf[--vp->s];
     return 1;
   }
   return 0;
@@ -34,8 +35,8 @@ goto_left(VoidPad *vp) {
 
 int32_t
 goto_right(VoidPad *vp) {
-  if (vp->aft_offset < vp->size) {
-    vp->buf[vp->gap_offset++] = vp->buf[vp->aft_offset++];
+  if (vp->e < vp->size) {
+    vp->buf[vp->s++] = vp->buf[vp->e++];
     return 1;
   }
   return 0;
@@ -66,7 +67,7 @@ down_n_lines(VoidPad *vp, int32_t n) {
         i--;
         c++;
     }
-    i = vp->aft_offset;
+    i = vp->e;
     while(n > 0) {
         if(vp->buf[i] == '\n')
             n--;
@@ -80,7 +81,7 @@ down_n_lines(VoidPad *vp, int32_t n) {
         i++;
         c--;
     }
-    return goto_point(vp, i - (vp->aft_offset - vp->gap_offset));
+    return goto_point(vp, i - (vp->e - vp->s));
 }
 
 int32_t
@@ -118,21 +119,21 @@ move_forward_line(VoidPad *vp, int32_t n) {
 
 int32_t
 goto_bol(VoidPad *vp) {
-  while (vp->gap_offset > 0) {
-    if (vp->buf[vp->gap_offset - 1] == '\n')
+  while (vp->s > 0) {
+    if (vp->buf[vp->s - 1] == '\n')
       break;
-    vp->buf[--vp->aft_offset] = vp->buf[--vp->gap_offset];
+    vp->buf[--vp->e] = vp->buf[--vp->s];
   }
   return 1;
 }
 
 int32_t
 goto_eol(VoidPad *vp) {
-  while (vp->aft_offset < vp->size) {
-    vp->buf[vp->gap_offset++] = vp->buf[vp->aft_offset++];
-    if (vp->buf[vp->aft_offset] == '\n') {
+  while (vp->e < vp->size) {
+    if (vp->buf[vp->e] == '\n') {
       break;
     }
+    vp->buf[vp->s++] = vp->buf[vp->e++];
   }
   return 1;
 }

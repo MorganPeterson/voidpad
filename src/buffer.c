@@ -5,58 +5,57 @@
 
 void
 destroy(VoidPad* vp) {
-  janet_free(vp->buf);
+  free(vp->buf);
+  free(vp);
 }
 
-void
+uint32_t
 create(VoidPad* vp, int32_t cap) {
-  uint8_t* buf = NULL;
+  int8_t* buf = NULL;
   if (cap < DEFAULT_SIZE) cap = DEFAULT_SIZE;
 
   cap = (size_t)cap * (size_t)sizeof(uint8_t);
-  buf = janet_malloc(cap + 1);
-  
-  if (buf == NULL) {
-    destroy(vp);
-    janet_panic("out of memory");
-  }
+  buf = malloc(cap);
+  if (!buf)
+    return 0;
 
   memset(buf, 0, cap);
-  vp->size = cap;
-  vp->aft_offset = cap;
-  vp->gap_offset = 0;
   vp->buf = buf;
+  vp->size = cap;
+  vp->s = 0;
+  vp->e = cap;
+  return 1;
 }
 
-void
+int32_t
 grow(VoidPad *vp, int32_t n) {
-  int32_t gap_size = get_gap_size(vp);
-  if (n < gap_size)
-    return;
+  int32_t len = vp->size - vp->e;
+  int32_t nsz = (n + DEFAULT_SIZE) * (size_t)sizeof(int8_t);
+  int8_t *nb = realloc(vp->buf, nsz);
+  
+  if (!nb)
+    return 0;
 
-  int32_t len = vp->size - vp->aft_offset;
-  n = (size_t)(n + DEFAULT_SIZE) * (size_t)sizeof(uint8_t);
-  uint8_t *newbuf = (uint8_t *)janet_realloc(vp->buf, n);
-  if(newbuf == NULL) {
-    destroy(vp);
-    janet_panic("Out of memory");
-  }
-  vp->buf = newbuf;
-  memmove(vp->buf + n - len, vp->buf + vp->aft_offset, len);
-  vp->aft_offset += (n - len);
-  vp->size += n;
+  nb[nsz] = 0;
+  vp->buf = nb;
+  memmove(vp->buf + nsz - len, vp->buf + vp->e, len);
+  vp->e = nsz - len;
+  vp->size = nsz;
+  return 1;
 }
 
-void
+int32_t
 voidpad_init(VoidPad *vp, const char *str){
   int32_t len = strlen(str);
   int32_t dfs = DEFAULT_SIZE;
 
   while (dfs < len) dfs <<= 1;
 
-  create(vp, dfs);
-  memcpy(vp->buf, str, len);
-
-  vp->gap_offset = len;
+  if (create(vp, dfs)) {
+    memcpy(vp->buf, str, len);
+    vp->s = len;
+    return 1;
+  }
+  return 0;
 }
 
