@@ -9,7 +9,7 @@ destroy(VoidPad* vp) {
   free(vp);
 }
 
-uint32_t
+int32_t
 create(VoidPad* vp, int32_t cap) {
   int8_t* buf = NULL;
   if (cap < DEFAULT_SIZE) cap = DEFAULT_SIZE;
@@ -30,7 +30,8 @@ create(VoidPad* vp, int32_t cap) {
 int32_t
 grow(VoidPad *vp, int32_t n) {
   int32_t len = vp->size - vp->e;
-  int32_t nsz = (n + DEFAULT_SIZE) * (size_t)sizeof(int8_t);
+  n = (n < DEFAULT_SIZE) ? DEFAULT_SIZE : n;
+  int32_t nsz = n * (size_t)sizeof(int8_t);
   int8_t *nb = realloc(vp->buf, nsz);
   
   if (!nb)

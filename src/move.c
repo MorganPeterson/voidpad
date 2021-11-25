@@ -44,50 +44,41 @@ goto_right(VoidPad *vp) {
 
 int32_t
 move_forward_char(VoidPad *vp, int32_t n) {
-  int32_t i = 0;
   if (n > 0) {
-    for (i=0; i < n; i++) {
-      if (!goto_right(vp))
-        break;
-    }
+    return goto_point(vp, vp->e + n);
   } else if (n < 0) {
-    for (i=0; i > n; i--) {
-      if (!goto_left(vp))
-        break;
-    }
+    return goto_point(vp, vp->s + n);
   }
-  return i;
+  return 0;
 }
 
 int32_t
 down_n_lines(VoidPad *vp, int32_t n) {
-    int32_t c = 0;
-    int32_t i = get_gap_size(vp);
-    while(i > 0 && vp->buf[i-1] != '\n') {
-        i--;
-        c++;
-    }
-    i = vp->e;
-    while(n > 0) {
-        if(vp->buf[i] == '\n')
-            n--;
-        i++;
-        if(i == vp->size)
-            return 0;
-    }
-    while(c > 0 && i < vp->size) {
-        if(vp->buf[i] == '\n')
-            break;
-        i++;
-        c--;
-    }
-    return goto_point(vp, i - (vp->e - vp->s));
+  int32_t c = 0, i = vp->s;
+  while(i > 0 && vp->buf[i-1] != '\n') {
+    i--;
+    c++;
+  }
+  i = vp->e;
+  while(n > 0) {
+    if(vp->buf[i] == '\n')
+      n--;
+    i++;
+    if(i == vp->size)
+      return 0;
+  }
+  while(c > 0 && i < vp->size) {
+    if(vp->buf[i] == '\n')
+      break;
+    i++;
+    c--;
+  }
+  return goto_point(vp, i - (vp->e - vp->s));
 }
 
 int32_t
 up_n_lines(VoidPad *vp, int32_t n) {
-    int32_t c = 0;
-    int32_t i = get_gap_size(vp);
+    int32_t c = 0, i = vp->s;
     while(i > 0 && vp->buf[i-1] != '\n') {
         i--;
         c++;

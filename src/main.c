@@ -104,12 +104,11 @@ cfun_vp_usr_size(int32_t argc, Janet *argv) {
 /* get char after point */
 static Janet
 cfun_vp_char_after_pointer(int32_t argc, Janet *argv) {
-  janet_arity(argc, 1, 2);
+  janet_fixarity(argc, 1);
   
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
-  int32_t point = janet_optinteger(argv, argc, 1, get_point(vp));
 
-  uint8_t result = char_after_pointer(vp, point);
+  uint8_t result = char_after_pointer(vp);
   
   return janet_wrap_integer(result);
 }
@@ -117,11 +116,10 @@ cfun_vp_char_after_pointer(int32_t argc, Janet *argv) {
 /* get char before point */
 static Janet
 cfun_vp_char_before_pointer(int32_t argc, Janet *argv) {
-  janet_arity(argc, 1, 2);
+  janet_fixarity(argc, 1);
   
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
-  int32_t point = janet_optinteger(argv, argc, 1, get_point(vp));
-  uint8_t result = char_before_pointer(vp, point);
+  uint8_t result = char_before_pointer(vp);
   return janet_wrap_integer(result);
 }
 
@@ -260,8 +258,10 @@ cfun_goto_char(int32_t argc, Janet *argv) {
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   int32_t n = janet_getinteger(argv, 1);
 
-  int32_t result = goto_point(vp, n);
-  return janet_wrap_integer(result);
+  if (goto_point(vp, n))
+    return janet_wrap_true();
+
+  return janet_wrap_false();
 }
 
 static Janet
@@ -270,8 +270,9 @@ cfun_fwd_char(int32_t argc, Janet *argv) {
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   int32_t n = janet_getinteger(argv, 1);
 
-  int32_t result = move_forward_char(vp, n);
-  return janet_wrap_integer(result);
+  if (move_forward_char(vp, n))
+    return janet_wrap_true();
+  return janet_wrap_false();
 }
 
 static Janet
@@ -280,8 +281,9 @@ cfun_fwd_line(int32_t argc, Janet *argv) {
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   int32_t n = janet_getinteger(argv, 1);
 
-  int32_t result = move_forward_line(vp, n);
-  return janet_wrap_integer(result);
+  if (move_forward_line(vp, n))
+    return janet_wrap_true();
+  return janet_wrap_false();
 }
 
 static Janet

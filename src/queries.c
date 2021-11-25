@@ -44,109 +44,57 @@ get_all_size(VoidPad *vp) {
 }
 
 uint8_t
-char_after_pointer(VoidPad *vp, int32_t pnt) {
-  int32_t pnt_max = get_point_max(vp);
-  int32_t pnt_min = get_point_min(vp);
-  if (pnt >= pnt_max) {
-    return vp->buf[pnt_max];
-  } else if (pnt >= 0 && pnt < pnt_max) {
-    if ((pnt + 1) < vp->s) {
-      return vp->buf[pnt + 1];
-    } else {
-      int32_t gs = get_gap_size(vp);
-      return vp->buf[pnt + gs];
-    }
-  } else {
-    janet_panicf(
-        "point not in range. min:%d pnt:%d max:%d",
-        pnt_min, pnt, pnt_max);
-  }
+char_after_pointer(VoidPad *vp) {
+  int32_t pnt = vp->e;
+  if (pnt < vp->size)
+    return vp->buf[pnt];
+  else
+    return vp->buf[vp->size - 1];
 }
 
 uint8_t
-char_before_pointer(VoidPad *vp, int32_t pnt) {
-  --pnt;
-  int32_t pnt_max = get_point_max(vp);
-  int32_t pnt_min = get_point_min(vp);
-  if (pnt == -1) {
-    return vp->buf[0];
-  } else if (pnt >= 0 && pnt <= pnt_max) {
-    if (pnt < vp->s) {
-      return vp->buf[pnt];
-    } else {
-      return vp->buf[vp->e + pnt];
-    }
+char_before_pointer(VoidPad *vp) {
+  int32_t pnt = vp->s - 1;
+  if (pnt > -1) {
+    return vp->buf[pnt];
   } else {
-    janet_panicf(
-        "pointer not in range. min:%d pnt:%d max:%d",
-        pnt_min, pnt, pnt_max);
+    return vp->buf[0];
   }
 }
 
 int32_t
 beginning_of_line(VoidPad *vp) {
-  int32_t pnt = get_point(vp);
-  int32_t pnt_min = get_point_min(vp);
-
-  /* at beginning of text */
-  if (pnt == pnt_min)
+  if (vp->s == 0)
     return 1;
 
-  /* test if before gap */
-  if (pnt < vp->s) {
-    if (vp->buf[pnt] == NEWLINE)
-      return 0;
-    --pnt;
-    if (pnt == pnt_min || vp->buf[pnt] == NEWLINE)
-      return 1;
-  } else {
-    if (vp->buf[vp->e + pnt] == NEWLINE)
-      return 0;
+  if (vp->buf[vp->s-1] == NEWLINE)
+    return 1;
 
-    if (vp->buf[pnt - 1] == NEWLINE) {
-      return 1;
-    } else {
-      if (vp->buf[vp->e + pnt - 1] == NEWLINE)
-        return 1;
-    }
-  }
   return 0;
 }
 
 int32_t
 end_of_line(VoidPad *vp) {
-  int32_t pnt = get_point(vp);
-  int32_t pnt_max = get_point_max(vp);
-  int32_t gs = get_gap_size(vp);
-
   /* at end of text */
-  if (pnt == pnt_max)
+  if (vp->e == vp->size)
     return 1;
  
-  if (pnt <= vp->e) {
-    if (vp->buf[pnt + 1] == NEWLINE)
-      return 1;
-  } else {
-    if (vp->buf[pnt + gs] == NEWLINE)
-      return 1;
-  }
+  if (vp->buf[vp->e] == NEWLINE)
+    return 1;
+
   return 0;
 }
 
 int32_t
 beginning_of_buffer(VoidPad *vp) {
-  int32_t pnt = get_point(vp);
-  int32_t pnt_min = get_point_min(vp);
-  if (pnt == pnt_min)
+  if (vp->s == 0)
     return 1;
   return 0;
 }
 
 int32_t
 end_of_buffer(VoidPad *vp) {
-  unsigned int pnt = get_point(vp);
-  unsigned int pnt_max = get_point_max(vp);
-  if (pnt == pnt_max)
+  if (vp->e == vp->size)
     return 1;
   return 0;
 }

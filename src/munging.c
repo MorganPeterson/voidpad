@@ -36,7 +36,7 @@ insert_string(VoidPad *vp, const char *s) {
 int32_t
 backspace_char(VoidPad *vp) {
   if (vp->s > 0) {
-    vp->s--;
+    vp->buf[--vp->s] = 0;
     return 1;
   }
   return 0;
@@ -45,7 +45,7 @@ backspace_char(VoidPad *vp) {
 int32_t
 delete_char(VoidPad *vp) {
   if (vp->e < vp->size) {
-    vp->e++;
+    vp->buf[++vp->e] = 0;
     return 1;
   }
   return 0;
@@ -53,18 +53,12 @@ delete_char(VoidPad *vp) {
 
 int32_t
 delete_region(VoidPad *vp, int32_t beg, int32_t end) {
-  if (end < beg)
+  if (end <= beg || beg < 0 || end >= vp->size)
     return 0;
 
-  if (beg < 0 || beg > vp->size)
-    return 0;
-
-  if (end > vp->size || end < 0)
-    return 0;
-    
   if (goto_point(vp, beg)) {
     for (int32_t i=beg; i<end; i++) {
-      delete_char(vp);
+      vp->buf[i] = 0;
     }
   } else {
     return 0;
