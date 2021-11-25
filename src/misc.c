@@ -6,14 +6,13 @@
 
 char *
 get_text(VoidPad *vp) {
-  unsigned int pos = get_usr_size(vp);
+  int32_t pos = get_usr_size(vp);
   if(vp->gap_offset < pos) {
-    unsigned int len = vp->gap_offset;
+    int32_t len = get_gap_offset(vp);
     memmove(vp->buf + vp->gap_offset, vp->buf + vp->aft_offset, len);
     vp->gap_offset += len;
     vp->aft_offset += len;
   }
 
-  vp->buf[vp->gap_offset] = '\0';
   return (char *)vp->buf;
 }

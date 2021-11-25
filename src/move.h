@@ -1,5 +1,5 @@
-int goto_point(VoidPad*, unsigned int);
-int move_forward_char(VoidPad*, int);
-int goto_bol(VoidPad*);
-int goto_eol(VoidPad*);
-int move_forward_line(VoidPad*, int);
+int32_t goto_point(VoidPad*, unsigned int32_t);
+int32_t move_forward_char(VoidPad*, int32_t);
+int32_t goto_bol(VoidPad*);
+int32_t goto_eol(VoidPad*);
+int32_t move_forward_line(VoidPad*, int32_t);

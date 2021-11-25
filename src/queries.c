@@ -2,57 +2,58 @@
 
 #define NEWLINE 10
 
-unsigned int
+int32_t
+get_gap_size(VoidPad *vp) {
+  return (vp->aft_offset - vp->gap_offset) + 1;
+}
+
+int32_t
+get_usr_size(VoidPad *vp) {
+  int32_t gs = get_gap_size(vp);
+  return vp->size - gs;
+}
+
+int32_t
 get_point(VoidPad *vp) {
   return vp->gap_offset;
 }
 
-unsigned int
+int32_t
 get_point_min(VoidPad *vp) {
   return 0;
 }
 
-unsigned int
+int32_t
 get_point_max(VoidPad *vp) {
-  return vp->size - (vp->aft_offset - vp->gap_offset);
+  return get_usr_size(vp);
 }
 
-unsigned int
+int32_t
 get_aft_offset(VoidPad *vp) {
   return vp->aft_offset;
 }
 
-unsigned int
+int32_t
 get_gap_offset(VoidPad *vp) {
   return vp->gap_offset;
 }
 
-unsigned int
-get_gap_size(VoidPad *vp) {
-  return vp->aft_offset - vp->gap_offset;
-}
-
-unsigned int
+int32_t
 get_all_size(VoidPad *vp) {
   return vp->size;
 }
 
-unsigned int
-get_usr_size(VoidPad *vp) {
-  return vp->size - (vp->aft_offset - vp->gap_offset);
-}
-
 uint8_t
-char_after_pointer(VoidPad *vp, unsigned int pnt) {
-  unsigned int pnt_max = get_point_max(vp);
-  unsigned int pnt_min = get_point_min(vp);
+char_after_pointer(VoidPad *vp, int32_t pnt) {
+  int32_t pnt_max = get_point_max(vp);
+  int32_t pnt_min = get_point_min(vp);
   if (pnt >= pnt_max) {
     return vp->buf[pnt_max];
   } else if (pnt >= 0 && pnt < pnt_max) {
     if ((pnt + 1) < vp->gap_offset) {
       return vp->buf[pnt + 1];
     } else {
-      uint32_t gs = get_gap_size(vp);
+      int32_t gs = get_gap_size(vp);
       return vp->buf[pnt + gs];
     }
   } else {
@@ -63,10 +64,10 @@ char_after_pointer(VoidPad *vp, unsigned int pnt) {
 }
 
 uint8_t
-char_before_pointer(VoidPad *vp, unsigned int pnt) {
+char_before_pointer(VoidPad *vp, int32_t pnt) {
   --pnt;
-  unsigned int pnt_max = get_point_max(vp);
-  unsigned int pnt_min = get_point_min(vp);
+  int32_t pnt_max = get_point_max(vp);
+  int32_t pnt_min = get_point_min(vp);
   if (pnt == -1) {
     return vp->buf[0];
   } else if (pnt >= 0 && pnt <= pnt_max) {
@@ -82,7 +83,7 @@ char_before_pointer(VoidPad *vp, unsigned int pnt) {
   }
 }
 
-int
+int32_t
 beginning_of_line(VoidPad *vp) {
   int32_t pnt = get_point(vp);
   int32_t pnt_min = get_point_min(vp);
@@ -112,7 +113,7 @@ beginning_of_line(VoidPad *vp) {
   return 0;
 }
 
-int
+int32_t
 end_of_line(VoidPad *vp) {
   int32_t pnt = get_point(vp);
   int32_t pnt_max = get_point_max(vp);
@@ -132,16 +133,16 @@ end_of_line(VoidPad *vp) {
   return 0;
 }
 
-int
+int32_t
 beginning_of_buffer(VoidPad *vp) {
-  unsigned int pnt = get_point(vp);
-  unsigned int pnt_min = get_point_min(vp);
+  int32_t pnt = get_point(vp);
+  int32_t pnt_min = get_point_min(vp);
   if (pnt == pnt_min)
     return 1;
   return 0;
 }
 
-int
+int32_t
 end_of_buffer(VoidPad *vp) {
   unsigned int pnt = get_point(vp);
   unsigned int pnt_max = get_point_max(vp);

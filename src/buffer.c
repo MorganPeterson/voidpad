@@ -13,7 +13,8 @@ create(VoidPad* vp, int32_t cap) {
   uint8_t* buf = NULL;
   if (cap < DEFAULT_SIZE) cap = DEFAULT_SIZE;
 
-  buf = janet_malloc(sizeof(uint8_t) * (size_t) cap);
+  cap = (size_t)cap * (size_t)sizeof(uint8_t);
+  buf = janet_malloc(cap + 1);
   
   if (buf == NULL) {
     destroy(vp);
@@ -33,8 +34,8 @@ grow(VoidPad *vp, int32_t n) {
   if (n < gap_size)
     return;
 
-  unsigned int len = vp->size - vp->aft_offset;
-  n = (n + DEFAULT_SIZE) * (size_t)sizeof(uint8_t);
+  int32_t len = vp->size - vp->aft_offset;
+  n = (size_t)(n + DEFAULT_SIZE) * (size_t)sizeof(uint8_t);
   uint8_t *newbuf = (uint8_t *)janet_realloc(vp->buf, n);
   if(newbuf == NULL) {
     destroy(vp);
@@ -42,7 +43,7 @@ grow(VoidPad *vp, int32_t n) {
   }
   vp->buf = newbuf;
   memmove(vp->buf + n - len, vp->buf + vp->aft_offset, len);
-  vp->aft_offset += n - len;
+  vp->aft_offset += (n - len);
   vp->size += n;
 }
 
@@ -56,7 +57,6 @@ voidpad_init(VoidPad *vp, const char *str){
   create(vp, dfs);
   memcpy(vp->buf, str, len);
 
-  vp->aft_offset = dfs;
   vp->gap_offset = len;
 }
 

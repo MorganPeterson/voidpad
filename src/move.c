@@ -4,9 +4,9 @@
 #include "buffer.h"
 #include "queries.h"
 
-int
-goto_point(VoidPad *vp, unsigned int n) {
-  unsigned int len = get_gap_size(vp);
+int32_t
+goto_point(VoidPad *vp, int32_t n) {
+  int32_t len = get_gap_size(vp);
   if (n > vp->size - len)
     n = vp->size - len;
   if (n < vp->gap_offset) {
@@ -23,7 +23,7 @@ goto_point(VoidPad *vp, unsigned int n) {
   return n;
 }
 
-int
+int32_t
 goto_left(VoidPad *vp) {
   if (vp->gap_offset > 0) {
     vp->buf[--vp->aft_offset] = vp->buf[--vp->gap_offset];
@@ -32,7 +32,7 @@ goto_left(VoidPad *vp) {
   return 0;
 }
 
-int
+int32_t
 goto_right(VoidPad *vp) {
   if (vp->aft_offset < vp->size) {
     vp->buf[vp->gap_offset++] = vp->buf[vp->aft_offset++];
@@ -41,9 +41,9 @@ goto_right(VoidPad *vp) {
   return 0;
 }
 
-int
-move_forward_char(VoidPad *vp, int n) {
-  int i = 0;
+int32_t
+move_forward_char(VoidPad *vp, int32_t n) {
+  int32_t i = 0;
   if (n > 0) {
     for (i=0; i < n; i++) {
       if (!goto_right(vp))
@@ -58,10 +58,10 @@ move_forward_char(VoidPad *vp, int n) {
   return i;
 }
 
-int
-down_n_lines(VoidPad *vp, unsigned int n) {
-    unsigned int c = 0;
-    unsigned int i = vp->gap_offset;
+int32_t
+down_n_lines(VoidPad *vp, int32_t n) {
+    int32_t c = 0;
+    int32_t i = get_gap_size(vp);
     while(i > 0 && vp->buf[i-1] != '\n') {
         i--;
         c++;
@@ -83,10 +83,10 @@ down_n_lines(VoidPad *vp, unsigned int n) {
     return goto_point(vp, i - (vp->aft_offset - vp->gap_offset));
 }
 
-int
-up_n_lines(VoidPad *vp, unsigned int n) {
-    unsigned int c = 0;
-    unsigned int i = vp->gap_offset;
+int32_t
+up_n_lines(VoidPad *vp, int32_t n) {
+    int32_t c = 0;
+    int32_t i = get_gap_size(vp);
     while(i > 0 && vp->buf[i-1] != '\n') {
         i--;
         c++;
@@ -106,8 +106,8 @@ up_n_lines(VoidPad *vp, unsigned int n) {
     return goto_point(vp, i);
 }
 
-int
-move_forward_line(VoidPad *vp, int n) {
+int32_t
+move_forward_line(VoidPad *vp, int32_t n) {
   if (n > 0) {
     return down_n_lines(vp, n);
   } else if (n < 0) {
@@ -116,7 +116,7 @@ move_forward_line(VoidPad *vp, int n) {
   return 0;
 }
 
-int
+int32_t
 goto_bol(VoidPad *vp) {
   while (vp->gap_offset > 0) {
     if (vp->buf[vp->gap_offset - 1] == '\n')
@@ -126,7 +126,7 @@ goto_bol(VoidPad *vp) {
   return 1;
 }
 
-int
+int32_t
 goto_eol(VoidPad *vp) {
   while (vp->aft_offset < vp->size) {
     vp->buf[vp->gap_offset++] = vp->buf[vp->aft_offset++];
