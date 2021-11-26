@@ -193,7 +193,7 @@ cfun_insert_char(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 2);
 
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
-  int8_t uchar = janet_getinteger(argv, 1);
+  int8_t uchar = janet_getnumber(argv, 1);
 
   if (insert_char(vp, uchar))
     return janet_wrap_true();
@@ -372,11 +372,15 @@ voidpad_put(void *p, Janet key, Janet value) {
   VoidPad *vp = (VoidPad*)p;
   if (janet_checktype(key, JANET_KEYWORD)) {
     if (janet_keyeq(key, "char")) {
-      const int8_t i = janet_unwrap_integer(value);
-      insert_char(vp, i);
+      if (janet_checktype(value, JANET_NUMBER)) {
+        const int8_t i = janet_unwrap_integer(value);
+        insert_char(vp, i);
+      }
     } else if (janet_keyeq(key, "string")) {
-      const char *j = (char*)janet_unwrap_string(value);
-      insert_string(vp, j);
+      if (janet_checktype(value, JANET_STRING)) {
+        const char *j = (char*)janet_unwrap_string(value);
+        insert_string(vp, j);
+      }
     }
   } else {
     janet_panic("expected keyword key");
