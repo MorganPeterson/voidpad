@@ -6,7 +6,6 @@
 void
 destroy(VoidPad* vp) {
   free(vp->buf);
-  free(vp);
 }
 
 int32_t
