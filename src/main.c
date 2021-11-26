@@ -6,7 +6,11 @@
 
 static const JanetAbstractType voidpad_t = {
   "voidpad/VoidPad",
-  JANET_ATEND_NAME
+  voidpad_gc,
+  NULL,
+  voidpad_get,
+  NULL,
+  JANET_ATEND_PUT
 };
 
 /* create a new gap buffer*/
