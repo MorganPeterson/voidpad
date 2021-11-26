@@ -4,12 +4,16 @@
 #include "move.h"
 #include "misc.h"
 
+int voidpad_gc(void*, size_t);
+int voidpad_get(void*, Janet, Janet*);
+void voidpad_put(void*, Janet, Janet);
+
 static const JanetAbstractType voidpad_t = {
-  "voidpad/VoidPad",
+  "voidpad",
   voidpad_gc,
   NULL,
   voidpad_get,
-  NULL,
+  voidpad_put,
   JANET_ATEND_PUT
 };
 
@@ -19,7 +23,7 @@ cfun_make_void_pad(int32_t argc, Janet *argv) {
   janet_arity(argc, 0, 1);
 
   const char* str = janet_optcstring(argv, argc, 0, "");
-  VoidPad *vp = janet_abstract(&voidpad_t, sizeof(VoidPad));
+  VoidPad *vp = (VoidPad*)janet_abstract(&voidpad_t, sizeof(VoidPad));
   
   voidpad_init(vp, str);
   return janet_wrap_abstract(vp);
@@ -326,35 +330,92 @@ cfun_destroy(int32_t argc, Janet *argv) {
   return janet_wrap_true();
 }
 
+int
+voidpad_gc(void *p, size_t s) {
+  (void)s;
+  VoidPad *vp = (VoidPad *)p;
+  destroy(vp);
+  return 0;
+}
+
+static const JanetMethod get_methods[] = {
+  {"point", cfun_vp_point},
+  {"point-min", cfun_vp_point_min},
+  {"point-max", cfun_vp_point_max},
+  {"aft-offset", cfun_vp_aft_offset},
+  {"gap-offset", cfun_vp_gap_offset},
+  {"size", cfun_vp_all_size},
+  {"gap-size", cfun_vp_gap_size},
+  {"usr-size", cfun_vp_usr_size},
+  {"char-after", cfun_vp_char_after_pointer},
+  {"char-before", cfun_vp_char_before_pointer},
+  {"bolp", cfun_beginning_of_line},
+  {"eolp", cfun_end_of_line},
+  {"bobp", cfun_beginning_of_buffer},
+  {"eobp", cfun_end_of_buffer},
+  {"to-string", cfun_get_string},
+  {NULL, NULL}
+};
+
+int
+voidpad_get(void *p, Janet key, Janet *out) {
+  if (janet_checktype(key, JANET_KEYWORD))
+    return janet_getmethod(janet_unwrap_keyword(key), get_methods, out);
+  else
+    janet_panic("expected keyword key");
+
+  return 1;
+}
+
+void
+voidpad_put(void *p, Janet key, Janet value) {
+  VoidPad *vp = (VoidPad*)p;
+  if (janet_checktype(key, JANET_KEYWORD)) {
+    if (janet_keyeq(key, "char")) {
+      const int8_t i = janet_unwrap_integer(value);
+      insert_char(vp, i);
+    } else if (janet_keyeq(key, "string")) {
+      const char *j = (char*)janet_unwrap_string(value);
+      insert_string(vp, j);
+    }
+  } else {
+    janet_panic("expected keyword key");
+  }
+}
+
+
 /* register functions */
 static JanetReg cfuns[] = {
-  {"make-void-pad", cfun_make_void_pad, "Init a new void pad"},
-  {"vp-destroy", cfun_destroy, "free() void pad"},
-  {"vp-point", cfun_vp_point, "Get current point"},
-  {"vp-point-min", cfun_vp_point_min, "Get current point min"},
-  {"vp-point-max", cfun_vp_point_max, "Get current point max"},
-  {"vp-aft-offset", cfun_vp_aft_offset, "Get current aft offset"},
-  {"vp-gap-offset", cfun_vp_gap_offset, "Get current gap offset"},
-  {"vp-all-size", cfun_vp_all_size, "Get total size of gap and text"},
-  {"vp-gap-size", cfun_vp_gap_size, "Get size of the gap"},
-  {"vp-usr-size", cfun_vp_usr_size, "Get the content size in the buffer"},
-  {"vp-char-after", cfun_vp_char_after_pointer, "Get char after pointer"},
-  {"vp-char-before", cfun_vp_char_before_pointer, "Get char before pointer"},
-  {"vp-bolp", cfun_beginning_of_line, "beginning of line?"},
-  {"vp-eolp", cfun_end_of_line, "end of line?"},
-  {"vp-bobp", cfun_beginning_of_buffer, "beginning of buffer?"},
-  {"vp-eobp", cfun_end_of_buffer, "end of buffer?"},
-  {"vp-insert-char", cfun_insert_char, "Insert character byte into buffer"},
-  {"vp-insert-string", cfun_insert_string, "Insert string into buffer"},
-  {"vp-delete-char", cfun_delete_char, "Delete characters from buffer"},
-  {"vp-delete-region", cfun_delete_region, "Delete region from buffer"},
-  {"vp-erase", cfun_erase, "Erase entire buffer retaining size"},
-  {"vp-goto-char", cfun_goto_char, "Go to new point n"},
-  {"vp-forward-char", cfun_fwd_char, "Pos n move forward n, neg n move backwards n"},
-  {"vp-forward-line", cfun_fwd_line, "Pos n move forward n, neg n move backwards n"},
-  {"vp-beginning-of-line", cfun_bol, "Move point to beginning of current line"},
-  {"vp-end-of-line", cfun_eol, "Move point to end of current line"},
-  {"vp->string", cfun_get_string, "Return a string representing the text"},
+  {"new",
+    cfun_make_void_pad,
+    "(voidpad/new)\n\n"
+      "Init a new void pad"},
+  {"destroy", cfun_destroy, "free() void pad"},
+  {"point", cfun_vp_point, "Get current point"},
+  {"point-min", cfun_vp_point_min, "Get current point min"},
+  {"point-max", cfun_vp_point_max, "Get current point max"},
+  {"aft-offset", cfun_vp_aft_offset, "Get current aft offset"},
+  {"gap-offset", cfun_vp_gap_offset, "Get current gap offset"},
+  {"size", cfun_vp_all_size, "Get total size of gap and text"},
+  {"gap-size", cfun_vp_gap_size, "Get size of the gap"},
+  {"usr-size", cfun_vp_usr_size, "Get the content size in the buffer"},
+  {"char-after", cfun_vp_char_after_pointer, "Get char after pointer"},
+  {"char-before", cfun_vp_char_before_pointer, "Get char before pointer"},
+  {"bolp", cfun_beginning_of_line, "beginning of line?"},
+  {"eolp", cfun_end_of_line, "end of line?"},
+  {"bobp", cfun_beginning_of_buffer, "beginning of buffer?"},
+  {"eobp", cfun_end_of_buffer, "end of buffer?"},
+  {"insert-char", cfun_insert_char, "Insert character byte into buffer"},
+  {"insert-string", cfun_insert_string, "Insert string into buffer"},
+  {"delete-char", cfun_delete_char, "Delete characters from buffer"},
+  {"delete-region", cfun_delete_region, "Delete region from buffer"},
+  {"erase", cfun_erase, "Erase entire buffer retaining size"},
+  {"goto-char", cfun_goto_char, "Go to new point n"},
+  {"forward-char", cfun_fwd_char, "Pos n move forward n, neg n move backwards n"},
+  {"forward-line", cfun_fwd_line, "Pos n move forward n, neg n move backwards n"},
+  {"beginning-of-line", cfun_bol, "Move point to beginning of current line"},
+  {"end-of-line", cfun_eol, "Move point to end of current line"},
+  {"to-string", cfun_get_string, "Return a string representing the text"},
   {NULL, NULL, NULL}
 };
 

@@ -29,33 +29,33 @@ Interface consists of:
 (def keyword [:string | :number | :empty])
 (def arg ["a string" | 100 | nil])
 
-(make-void-pad buf keyword & arg) # Return a new Void Pad buffer
-(vp-destroy buf)                  # Free() Void Pad memory
-(vp-point buf)                    # Return current position of the pointer.
-(vp-point-min buf)                # Return min pointer position. Always 0.
-(vp-point-max buf)                # Return end of the text buffer position.
-(vp-aft-offset buf)               # Return end of the gap buffer position.
-(vp-gap-offset buf)               # Return beginning of the gap position.
-(vp-all-size buf)                 # Return size in total bytes of the buffer.
-(vp-gap-size buf)                 # Return size of the gap.
-(vp-usr-size buf)                 # Return total size of the text.
-(vp-char-after buf)               # Return character after pointer.
-(vp-char-before buf)              # Return character before pointer.
-(vp-bolp buf)                     # Return true?/false? Beginning of line?
-(vp-eolp buf)                     # Return true?/false? End of line?
-(vp-bobp buf)                     # Return true?/false? Beginning of buffer?
-(vp-eolp buf)                     # Return true?/false? End of buffer?
-(vp-insert-char buf byte)         # Insert byte at current pointer.
-(vp-insert-string buf str)        # Insert string at current pointer.
-(vp-delete-char buf n)            # Delete n bytes from pointer. (n delete, -n backspace)
-(vp-delete-region buf n m)        # Delete from n to m not including m.
-(vp-erase buf)                    # Delete entire buffer.
-(vp-goto-char buf n)              # Move pointer to n in the buffer.
-(vp-forward-char buf n)           # Move pointer n postions. (n to the right, -n to the left)
-(vp-forward-line buf n)           # Move pointer n lines. (n towards bottom, -n towards top)
-(vp-beginning-of-line buf)        # Move pointer to beginning of current line.
-(vp-end-of-line buf)              # Move pointer to end of line.
-(vp->string buf)                  # Return entire buffer text as string.
+(new buf keyword & arg) # Return a new Void Pad buffer
+(destroy buf)           # Free() Void Pad memory
+(point buf)             # Return current position of the pointer.
+(point-min buf)         # Return min pointer position. Always 0.
+(point-max buf)         # Return end of the text buffer position.
+(aft-offset buf)        # Return end of the gap buffer position.
+(gap-offset buf)        # Return beginning of the gap position.
+(all-size buf)          # Return size in total bytes of the buffer.
+(gap-size buf)          # Return size of the gap.
+(usr-size buf)          # Return total size of the text.
+(char-after buf)        # Return character after pointer.
+(char-before buf)       # Return character before pointer.
+(bolp buf)              # Return true?/false? Beginning of line?
+(eolp buf)              # Return true?/false? End of line?
+(bobp buf)              # Return true?/false? Beginning of buffer?
+(eolp buf)              # Return true?/false? End of buffer?
+(insert-char buf byte)  # Insert byte at current pointer.
+(insert-string buf str) # Insert string at current pointer.
+(delete-char buf n)     # Delete n bytes from pointer. (n delete, -n backspace)
+(delete-region buf n m) # Delete from n to m not including m.
+(erase buf)             # Delete entire buffer.
+(goto-char buf n)       # Move pointer to n in the buffer.
+(forward-char buf n)    # Move pointer n postions. (n to the right, -n to the left)
+(forward-line buf n)    # Move pointer n lines. (n towards bottom, -n towards top)
+(beginning-of-line buf) # Move pointer to beginning of current line.
+(end-of-line buf)       # Move pointer to end of line.
+(to-string buf)         # Return entire buffer text as string.
 ```
 
 See test/test.janet for more examples of usage.
