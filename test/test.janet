@@ -91,7 +91,6 @@
         (expect (forward-line buf1 -1) false)
         (expect (string/from-bytes (char-before buf1)) "i")
         (expect (string/from-bytes (char-after buf1)) "c")
-        
         (expect (forward-line buf1 1) true)
         (expect (string/from-bytes (char-before buf1)) "o")
         (expect (string/from-bytes (char-after buf1)) "v")

@@ -1,4 +1,5 @@
 #include "buffer.h"
+#include "move.h"
 
 #define NEWLINE 10
 
@@ -62,6 +63,16 @@ char_before_pointer(VoidPad *vp) {
   }
 }
 
+uint8_t
+char_at_n(VoidPad *vp, uint32_t n) {
+  if (n >= vp->s) {
+    n += vp->e - vp->s;
+    if (n >= vp->size)
+      return '\0';
+  }
+  return vp->buf[n];
+}
+
 int32_t
 beginning_of_line(VoidPad *vp) {
   if (vp->s == 0)
@@ -97,5 +108,12 @@ end_of_buffer(VoidPad *vp) {
   if (vp->e == vp->size)
     return 1;
   return 0;
+}
+
+uint8_t *
+get_text(VoidPad *vp) {
+  goto_eob(vp);
+  vp->buf[vp->s] = '\0';
+  return vp->buf;
 }
 

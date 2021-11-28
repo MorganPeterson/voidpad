@@ -129,3 +129,23 @@ goto_eol(VoidPad *vp) {
   return 1;
 }
 
+void
+goto_bob(VoidPad *vp) {
+  if (vp->s > 0) {
+    uint32_t len = vp->s;
+    memmove(vp->buf+vp->e-len, vp->buf, len);
+    vp->s -= len;
+    vp->e -= len;
+  }
+}
+
+void
+goto_eob(VoidPad *vp) {
+  uint32_t pos = vp->size - (vp->e - vp->s);
+  if (vp->s < pos) {
+    uint32_t len = pos - vp->s;
+    memmove(vp->buf+vp->s, vp->buf+vp->e, len);
+    vp->s += len;
+    vp->e += len;
+  }
+}

@@ -2,7 +2,6 @@
 #include "queries.h"
 #include "munging.h"
 #include "move.h"
-#include "misc.h"
 
 int voidpad_gc(void*, size_t);
 int voidpad_get(void*, Janet, Janet*);
@@ -24,6 +23,9 @@ cfun_make_void_pad(int32_t argc, Janet *argv) {
 
   const char* str = janet_optcstring(argv, argc, 0, "");
   VoidPad *vp = (VoidPad*)janet_abstract(&voidpad_t, sizeof(VoidPad));
+  vp->size = 0;
+  vp->s = 0;
+  vp->e = 0;
   
   voidpad_init(vp, str);
   return janet_wrap_abstract(vp);
@@ -128,6 +130,16 @@ cfun_vp_char_before_pointer(int32_t argc, Janet *argv) {
   
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   uint8_t result = char_before_pointer(vp);
+  return janet_wrap_integer(result);
+}
+
+/* get char at a given point n */
+static Janet
+cfun_vp_char_at_n(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 2);
+  VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
+  int32_t n = janet_getinteger(argv, 1);
+  uint8_t result = char_at_n(vp, n);
   return janet_wrap_integer(result);
 }
 
@@ -273,6 +285,24 @@ cfun_goto_char(int32_t argc, Janet *argv) {
 }
 
 static Janet
+cfun_goto_bob(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 1);
+  VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
+
+  goto_bob(vp);
+  return janet_wrap_true();
+}
+
+static Janet
+cfun_goto_eob(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 1);
+  VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
+
+  goto_eob(vp);
+  return janet_wrap_true();
+}
+
+static Janet
 cfun_fwd_char(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 2);
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
@@ -318,7 +348,7 @@ static Janet
 cfun_get_string(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
-  char *str = get_text(vp);
+  const char *str = (char*)get_text(vp);
   return janet_wrap_string(janet_cstring(str)); 
 }
 
@@ -349,6 +379,7 @@ static const JanetMethod get_methods[] = {
   {"usr-size", cfun_vp_usr_size},
   {"char-after", cfun_vp_char_after_pointer},
   {"char-before", cfun_vp_char_before_pointer},
+  {"char-at", cfun_vp_char_at_n},
   {"bolp", cfun_beginning_of_line},
   {"eolp", cfun_end_of_line},
   {"bobp", cfun_beginning_of_buffer},
@@ -362,7 +393,7 @@ voidpad_get(void *p, Janet key, Janet *out) {
   if (janet_checktype(key, JANET_KEYWORD))
     return janet_getmethod(janet_unwrap_keyword(key), get_methods, out);
   else
-    janet_panic("expected keyword key");
+    janet_panic("expected key to be :keyword");
 
   return 1;
 }
@@ -383,7 +414,7 @@ voidpad_put(void *p, Janet key, Janet value) {
       }
     }
   } else {
-    janet_panic("expected keyword key");
+    janet_panic("expected key to be :keyword");
   }
 }
 
@@ -392,7 +423,7 @@ voidpad_put(void *p, Janet key, Janet value) {
 static JanetReg cfuns[] = {
   {"new",
     cfun_make_void_pad,
-    "(voidpad/new)\n\n"
+    "(voidpad/new &string)\n\n"
       "Init a new void pad"},
   {"destroy", cfun_destroy, "free() void pad"},
   {"point", cfun_vp_point, "Get current point"},
@@ -405,6 +436,7 @@ static JanetReg cfuns[] = {
   {"usr-size", cfun_vp_usr_size, "Get the content size in the buffer"},
   {"char-after", cfun_vp_char_after_pointer, "Get char after pointer"},
   {"char-before", cfun_vp_char_before_pointer, "Get char before pointer"},
+  {"char-at", cfun_vp_char_at_n, "Char at point n"},
   {"bolp", cfun_beginning_of_line, "beginning of line?"},
   {"eolp", cfun_end_of_line, "end of line?"},
   {"bobp", cfun_beginning_of_buffer, "beginning of buffer?"},
@@ -415,6 +447,8 @@ static JanetReg cfuns[] = {
   {"delete-region", cfun_delete_region, "Delete region from buffer"},
   {"erase", cfun_erase, "Erase entire buffer retaining size"},
   {"goto-char", cfun_goto_char, "Go to new point n"},
+  {"goto-bob", cfun_goto_bob, "Go to beginning of buffer"},
+  {"goto-eob", cfun_goto_eob, "Go to end of buffer"},
   {"forward-char", cfun_fwd_char, "Pos n move forward n, neg n move backwards n"},
   {"forward-line", cfun_fwd_line, "Pos n move forward n, neg n move backwards n"},
   {"beginning-of-line", cfun_bol, "Move point to beginning of current line"},

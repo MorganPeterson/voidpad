@@ -2,6 +2,8 @@
 #include "queries.h"
 
 #define DEFAULT_SIZE 4
+#define MIN_GAP_EXPAND 4
+#define MAX_SIZE_T ((unsigned long) (size_t) ~0)
 
 void
 destroy(VoidPad* vp) {
@@ -9,53 +11,46 @@ destroy(VoidPad* vp) {
 }
 
 int32_t
-create(VoidPad* vp, int32_t cap) {
-  int8_t* buf = NULL;
-  if (cap < DEFAULT_SIZE) cap = DEFAULT_SIZE;
+grow_gap(VoidPad *vp, uint32_t n) {
+  uint8_t *new;
+  int32_t newlen;
+  int32_t oldlen = vp->size - vp->e;
 
-  cap = (size_t)cap * (size_t)sizeof(uint8_t);
-  buf = malloc(cap);
-  if (!buf)
-    return 0;
+  n = n < MIN_GAP_EXPAND ? MIN_GAP_EXPAND : n;
 
-  memset(buf, 0, cap);
-  vp->buf = buf;
-  vp->size = cap;
-  vp->s = 0;
-  vp->e = cap;
-  return 1;
-}
-
-int32_t
-grow(VoidPad *vp, int32_t n) {
-  int32_t len = vp->size - vp->e;
-  n = (n < DEFAULT_SIZE) ? DEFAULT_SIZE : n;
-  int32_t nsz = n * (size_t)sizeof(int8_t);
-  int8_t *nb = realloc(vp->buf, nsz);
-  
-  if (!nb)
-    return 0;
-
-  nb[nsz] = 0;
-  vp->buf = nb;
-  memmove(vp->buf + nsz - len, vp->buf + vp->e, len);
-  vp->e = nsz - len;
-  vp->size = nsz;
+  if (vp->size == 0) {
+    newlen = n * sizeof(uint8_t);
+    if (newlen < 0 || MAX_SIZE_T < newlen)
+      janet_panic("Failed to allocate memory");
+    new = janet_malloc((size_t)newlen);
+    if (new == NULL)
+      janet_panic("Failed to allocate memory");
+  } else {
+    newlen = (vp->size + n) * sizeof(uint8_t);
+    if (newlen < 0 || MAX_SIZE_T < newlen)
+      return 0;
+    new = janet_realloc(vp->buf, newlen);
+    if (new == NULL)
+      return 0;
+  }
+  memmove(new + newlen - oldlen, new + vp->e, oldlen);
+  vp->buf = new;
+  vp->size = newlen;
+  vp->e = vp->e + n;
+  memset(vp->buf+vp->s, 0, vp->e - vp->s);
   return 1;
 }
 
 int32_t
 voidpad_init(VoidPad *vp, const char *str){
   int32_t len = strlen(str);
-  int32_t dfs = DEFAULT_SIZE;
+  int32_t dfs = len + DEFAULT_SIZE;
 
-  while (dfs < len) dfs <<= 1;
-
-  if (create(vp, dfs)) {
-    memcpy(vp->buf, str, len);
-    vp->s = len;
-    return 1;
-  }
-  return 0;
+  grow_gap(vp, dfs);
+  memcpy(vp->buf, str, len);
+  memset(vp->buf + len, 0, DEFAULT_SIZE);
+  vp->s = len;
+  vp->e = dfs;
+  return 1;
 }
 

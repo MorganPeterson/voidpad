@@ -7,8 +7,8 @@
 
 int32_t
 insert_char(VoidPad *vp, int8_t c) {
-  if (vp->s == vp->e) {
-    if (!grow(vp, vp->size << 1))
+  if ((vp->e - vp->s) < 4) {
+    if (!grow_gap(vp, 4))
       return 0;
   }
   vp->buf[vp->s++] = c;
@@ -19,12 +19,12 @@ int32_t
 insert_string(VoidPad *vp, const char *s) {
   int32_t len = strlen(s);
   int32_t gps = vp->e - vp->s;
-  if (len > gps) {
+  if (len >= gps) {
     int32_t size = vp->size << 1;
     int32_t n = vp->size - gps;
     while (n + len > size)
       size <<= 1;
-    if(!grow(vp, size))
+    if(!grow_gap(vp, size))
       return 0;
   }
   memcpy(vp->buf + vp->s, s, len);

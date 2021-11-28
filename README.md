@@ -36,7 +36,7 @@ Interface consists of:
 (point-max buf)         # Return end of the text buffer position.
 (aft-offset buf)        # Return end of the gap buffer position.
 (gap-offset buf)        # Return beginning of the gap position.
-(all-size buf)          # Return size in total bytes of the buffer.
+(size buf)              # Return size in total bytes of the buffer.
 (gap-size buf)          # Return size of the gap.
 (usr-size buf)          # Return total size of the text.
 (char-after buf)        # Return character after pointer.
@@ -44,13 +44,15 @@ Interface consists of:
 (bolp buf)              # Return true?/false? Beginning of line?
 (eolp buf)              # Return true?/false? End of line?
 (bobp buf)              # Return true?/false? Beginning of buffer?
-(eolp buf)              # Return true?/false? End of buffer?
+(eobp buf)              # Return true?/false? End of buffer?
 (insert-char buf byte)  # Insert byte at current pointer.
 (insert-string buf str) # Insert string at current pointer.
 (delete-char buf n)     # Delete n bytes from pointer. (n delete, -n backspace)
 (delete-region buf n m) # Delete from n to m not including m.
 (erase buf)             # Delete entire buffer.
 (goto-char buf n)       # Move pointer to n in the buffer.
+(goto-bob buf)          # Move pointer to the beginning of the buffer.
+(goto-eob buf)          # Move pointer to the end of the buffer.
 (forward-char buf n)    # Move pointer n postions. (n to the right, -n to the left)
 (forward-line buf n)    # Move pointer n lines. (n towards bottom, -n towards top)
 (beginning-of-line buf) # Move pointer to beginning of current line.
