@@ -45,7 +45,7 @@ backspace_char(VoidPad *vp) {
 int32_t
 delete_char(VoidPad *vp) {
   if (vp->e < vp->size) {
-    vp->buf[++vp->e] = 0;
+    vp->buf[vp->e++] = 0;
     return 1;
   }
   return 0;

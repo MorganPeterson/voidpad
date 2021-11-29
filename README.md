@@ -27,10 +27,10 @@ Interface consists of:
 
 ```janet
 (def keyword [:string | :number | :empty])
-(def arg ["a string" | 100 | nil])
+(def arg ["a string" | nil])
 
 (new buf keyword & arg) # Return a new Void Pad buffer
-(destroy buf)           # Free() Void Pad memory
+(destroy buf)           # Free() buffer memory
 (point buf)             # Return current position of the pointer.
 (point-min buf)         # Return min pointer position. Always 0.
 (point-max buf)         # Return end of the text buffer position.
@@ -41,6 +41,7 @@ Interface consists of:
 (usr-size buf)          # Return total size of the text.
 (char-after buf)        # Return character after pointer.
 (char-before buf)       # Return character before pointer.
+(char-at buf n)         # Return character at position n.
 (bolp buf)              # Return true?/false? Beginning of line?
 (eolp buf)              # Return true?/false? End of line?
 (bobp buf)              # Return true?/false? Beginning of buffer?

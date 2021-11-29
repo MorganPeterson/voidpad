@@ -45,9 +45,15 @@ goto_right(VoidPad *vp) {
 int32_t
 move_forward_char(VoidPad *vp, int32_t n) {
   if (n > 0) {
-    return goto_point(vp, vp->e + n);
+    if (n == 1)
+      return goto_right(vp);
+    else
+      return goto_point(vp, vp->e + n);
   } else if (n < 0) {
-    return goto_point(vp, vp->s + n);
+    if (n == -1)
+      return goto_left(vp);
+    else
+      return goto_point(vp, vp->s + n);
   }
   return 0;
 }
@@ -55,6 +61,8 @@ move_forward_char(VoidPad *vp, int32_t n) {
 int32_t
 down_n_lines(VoidPad *vp, int32_t n) {
   int32_t c = 0, i = vp->s;
+  if (vp->e == vp->size) return 1;
+
   while(i > 0 && vp->buf[i-1] != '\n') {
     i--;
     c++;
