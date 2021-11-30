@@ -91,6 +91,26 @@ cfun_vp_all_size(int32_t argc, Janet *argv) {
   return janet_wrap_integer(result);
 }
 
+/* get the buffer point that is the begging of the line of n */
+static Janet
+cfun_vp_get_bol(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 2);
+  VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
+  int32_t n = janet_getinteger(argv, 1);
+  int32_t result = get_beginning_of_line(vp, n);
+  return janet_wrap_integer(result);
+}
+
+/* get the buffer point that is the end of the line of n */
+static Janet
+cfun_vp_get_eol(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 2);
+  VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
+  int32_t n = janet_getinteger(argv, 1);
+  int32_t result = get_end_of_line(vp, n);
+  return janet_wrap_integer(result);
+}
+
 /* get the gap size */
 static Janet
 cfun_vp_gap_size(int32_t argc, Janet *argv) {
@@ -375,6 +395,8 @@ static const JanetMethod get_methods[] = {
   {"aft-offset", cfun_vp_aft_offset},
   {"gap-offset", cfun_vp_gap_offset},
   {"size", cfun_vp_all_size},
+  {"line-start", cfun_vp_get_bol},
+  {"line-end", cfun_vp_get_eol},
   {"gap-size", cfun_vp_gap_size},
   {"usr-size", cfun_vp_usr_size},
   {"char-after", cfun_vp_char_after_pointer},
@@ -432,6 +454,8 @@ static JanetReg cfuns[] = {
   {"aft-offset", cfun_vp_aft_offset, "Get current aft offset"},
   {"gap-offset", cfun_vp_gap_offset, "Get current gap offset"},
   {"size", cfun_vp_all_size, "Get total size of gap and text"},
+  {"line-start", cfun_vp_get_bol, "Get the beginning point of line"},
+  {"line-end", cfun_vp_get_eol, "Get the end point of line"},
   {"gap-size", cfun_vp_gap_size, "Get size of the gap"},
   {"usr-size", cfun_vp_usr_size, "Get the content size in the buffer"},
   {"char-after", cfun_vp_char_after_pointer, "Get char after pointer"},

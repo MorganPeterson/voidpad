@@ -8,6 +8,8 @@ int32_t get_aft_offset(VoidPad*);
 int32_t get_gap_offset(VoidPad*);
 int32_t get_gap_size(VoidPad*);
 int32_t get_all_size(VoidPad*);
+int32_t get_beginning_of_line(VoidPad*, register int32_t);
+int32_t get_end_of_line(VoidPad*, register int32_t);
 int32_t get_usr_size(VoidPad*);
 uint8_t char_after_pointer(VoidPad*);
 uint8_t char_before_pointer(VoidPad*);

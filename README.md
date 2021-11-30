@@ -26,10 +26,9 @@ invest, yet.
 Interface consists of:
 
 ```janet
-(def keyword [:string | :number | :empty])
 (def arg ["a string" | nil])
 
-(new buf keyword & arg) # Return a new Void Pad buffer
+(new buf keyword)       # Return a new Void Pad buffer
 (destroy buf)           # Free() buffer memory
 (point buf)             # Return current position of the pointer.
 (point-min buf)         # Return min pointer position. Always 0.
@@ -37,6 +36,8 @@ Interface consists of:
 (aft-offset buf)        # Return end of the gap buffer position.
 (gap-offset buf)        # Return beginning of the gap position.
 (size buf)              # Return size in total bytes of the buffer.
+(line-start buf n)      # Return bol given position n
+(line-end buf n)        # Return eol given posttion n
 (gap-size buf)          # Return size of the gap.
 (usr-size buf)          # Return total size of the text.
 (char-after buf)        # Return character after pointer.
