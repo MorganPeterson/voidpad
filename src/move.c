@@ -73,7 +73,7 @@ down_n_lines(VoidPad *vp, int32_t n) {
       n--;
     i++;
     if(i == vp->size)
-      return 0;
+      break;
   }
   while(c > 0 && i < vp->size) {
     if(vp->buf[i] == '\n')
