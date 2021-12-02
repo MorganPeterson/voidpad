@@ -1,5 +1,6 @@
 #ifndef H_VOIDPAD
 #define H_VOIDPAD
+#include <stdint.h>
 
 #if __GNUC__ >= 4
     #define SO_IMPORT __attribute__((visibility("default")))
