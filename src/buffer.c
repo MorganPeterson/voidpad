@@ -2,8 +2,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "buffer.h"
-#include "queries.h"
+#include "voidpad.h"
 
 #define DEFAULT_SIZE 4
 #define MIN_GAP_EXPAND 4

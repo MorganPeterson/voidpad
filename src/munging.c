@@ -1,9 +1,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "buffer.h"
-#include "queries.h"
-#include "move.h"
+#include "voidpad.h"
 
 int32_t
 insert_char(VoidPad *vp, int8_t c) {

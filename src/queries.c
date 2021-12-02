@@ -1,9 +1,6 @@
 #include <stdint.h>
 
-#include "buffer.h"
-#include "move.h"
-
-#define NEWLINE 10
+#include "voidpad.h"
 
 int32_t
 get_gap_size(VoidPad *vp) {

@@ -2,11 +2,10 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "buffer.h"
-#include "queries.h"
+#include "voidpad.h"
 
 int32_t
-goto_point(VoidPad *vp, int32_t n) {
+goto_point(VoidPad *vp, uint32_t n) {
   int32_t len = vp->e - vp->s;
   if (n > vp->size - len)
     n = vp->size - len;
