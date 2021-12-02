@@ -1,5 +1,3 @@
-#include <janet/janet.h>
-
 struct voidpad {
   uint8_t *buf;  /* the buffer */
   int32_t size;  /* size allocated for buf */

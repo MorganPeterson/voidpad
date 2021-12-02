@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include "buffer.h"
 #include "move.h"
 
@@ -46,14 +48,37 @@ get_all_size(VoidPad *vp) {
 
 int32_t
 get_beginning_of_line(VoidPad *vp, register int32_t offset) {
-  while (0 < offset && vp->buf[--offset] != '\n');
-  return 0 < offset ? ++offset : 0;
+  int32_t gs = get_gap_size(vp);
+  int32_t off_gs = offset + gs;
+
+  if (offset < 0 || off_gs > vp->size)
+    return 0;
+
+  while (offset > 0) {
+    if (offset < vp->s) {
+      if (vp->buf[offset] == '\n') {
+        offset++;
+        break;
+      }
+    } else {
+      if (vp->buf[off_gs] == '\n') {
+        offset++;
+        break;
+      }
+    }
+    offset--;
+    off_gs--;
+  }
+  return offset;
 }
 
 int32_t
 get_end_of_line(VoidPad *vp, register int32_t offset) {
   int32_t gs = get_gap_size(vp);
   int32_t off_gs = offset + gs;
+  if (offset < 0 || off_gs > vp->size)
+    return 0;
+
   while (off_gs < vp->size) {
     if (offset < vp->s) {
       if (vp->buf[offset] == '\n')
@@ -113,7 +138,7 @@ end_of_line(VoidPad *vp) {
   /* at end of text */
   if (vp->e == vp->size)
     return 1;
- 
+
   if (vp->buf[vp->e] == NEWLINE)
     return 1;
 
@@ -139,5 +164,24 @@ get_text(VoidPad *vp) {
   goto_eob(vp);
   vp->buf[vp->s] = '\0';
   return vp->buf;
+}
+
+void
+get_line_stats(VoidPad *vp, int32_t *cur, int32_t *last) {
+  int32_t line = 0;
+  int32_t usr_size = get_usr_size(vp);
+
+  *cur = -1;
+  for (int i=0; i < vp->size; i++) {
+    line += vp->buf[i] == '\n' ? 1 : 0;
+    *last = line;
+
+    if (*cur == -1 && i == vp->s) {
+      *cur = vp->buf[i] == '\n' ? line : line + 1;
+    }
+  }
+  *last += 1;
+  if (vp->s == usr_size)
+    *cur = *last;
 }
 

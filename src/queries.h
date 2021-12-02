@@ -19,4 +19,5 @@ int32_t end_of_line(VoidPad*);
 int32_t beginning_of_buffer(VoidPad*);
 int32_t end_of_buffer(VoidPad*);
 uint8_t *get_text(VoidPad*);
+void get_line_stats(VoidPad*, int32_t*, int32_t*);
 

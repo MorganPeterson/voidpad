@@ -1,3 +1,5 @@
+#include <janet/janet.h>
+
 #include "buffer.h"
 #include "queries.h"
 #include "munging.h"
@@ -26,8 +28,10 @@ cfun_make_void_pad(int32_t argc, Janet *argv) {
   vp->size = 0;
   vp->s = 0;
   vp->e = 0;
-  
-  voidpad_init(vp, str);
+
+  int32_t result = voidpad_init(vp, str);
+  if (!result)
+    janet_panic("unable to assign memory to gap");
   return janet_wrap_abstract(vp);
 }
 
@@ -35,7 +39,7 @@ cfun_make_void_pad(int32_t argc, Janet *argv) {
 static Janet
 cfun_vp_point(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   int32_t result = get_point(vp);
   return janet_wrap_integer(result);
@@ -45,7 +49,7 @@ cfun_vp_point(int32_t argc, Janet *argv) {
 static Janet
 cfun_vp_point_min(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   int32_t result = get_point_min(vp);
   return janet_wrap_integer(result);
@@ -55,7 +59,7 @@ cfun_vp_point_min(int32_t argc, Janet *argv) {
 static Janet
 cfun_vp_point_max(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   int32_t result = get_point_max(vp);
   return janet_wrap_integer(result);
@@ -65,7 +69,7 @@ cfun_vp_point_max(int32_t argc, Janet *argv) {
 static Janet
 cfun_vp_aft_offset(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   int32_t result = get_aft_offset(vp);
   return janet_wrap_integer(result);
@@ -75,7 +79,7 @@ cfun_vp_aft_offset(int32_t argc, Janet *argv) {
 static Janet
 cfun_vp_gap_offset(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   int32_t result = get_gap_offset(vp);
   return janet_wrap_integer(result);
@@ -85,7 +89,7 @@ cfun_vp_gap_offset(int32_t argc, Janet *argv) {
 static Janet
 cfun_vp_all_size(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   int32_t result = get_all_size(vp);
   return janet_wrap_integer(result);
@@ -115,7 +119,7 @@ cfun_vp_get_eol(int32_t argc, Janet *argv) {
 static Janet
 cfun_vp_gap_size(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   int32_t result = get_gap_size(vp);
   return janet_wrap_integer(result);
@@ -125,7 +129,7 @@ cfun_vp_gap_size(int32_t argc, Janet *argv) {
 static Janet
 cfun_vp_usr_size(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   int32_t result = get_usr_size(vp);
   return janet_wrap_integer(result);
@@ -135,11 +139,11 @@ cfun_vp_usr_size(int32_t argc, Janet *argv) {
 static Janet
 cfun_vp_char_after_pointer(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
 
   uint8_t result = char_after_pointer(vp);
-  
+
   return janet_wrap_integer(result);
 }
 
@@ -147,7 +151,7 @@ cfun_vp_char_after_pointer(int32_t argc, Janet *argv) {
 static Janet
 cfun_vp_char_before_pointer(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   uint8_t result = char_before_pointer(vp);
   return janet_wrap_integer(result);
@@ -167,13 +171,13 @@ cfun_vp_char_at_n(int32_t argc, Janet *argv) {
 static Janet
 cfun_beginning_of_line(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
 
   if (beginning_of_line(vp)) {
     return janet_wrap_true();
   }
-  
+
   return janet_wrap_false();
 }
 
@@ -181,13 +185,13 @@ cfun_beginning_of_line(int32_t argc, Janet *argv) {
 static Janet
 cfun_end_of_line(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
 
   if (end_of_line(vp)) {
     return janet_wrap_true();
   }
-  
+
   return janet_wrap_false();
 }
 
@@ -195,13 +199,13 @@ cfun_end_of_line(int32_t argc, Janet *argv) {
 static Janet
 cfun_beginning_of_buffer(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
 
   if (beginning_of_buffer(vp)) {
     return janet_wrap_true();
   }
-  
+
   return janet_wrap_false();
 }
 
@@ -209,13 +213,13 @@ cfun_beginning_of_buffer(int32_t argc, Janet *argv) {
 static Janet
 cfun_end_of_buffer(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
-  
+
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
 
   if (end_of_buffer(vp)) {
     return janet_wrap_true();
   }
-  
+
   return janet_wrap_false();
 }
 
@@ -226,9 +230,13 @@ cfun_insert_char(int32_t argc, Janet *argv) {
 
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   int8_t uchar = janet_getnumber(argv, 1);
+  int32_t result = insert_char(vp, uchar);
 
-  if (insert_char(vp, uchar))
-    return janet_wrap_true();
+  switch (result) {
+    case 1: return janet_wrap_true();
+    case -1: janet_panic("Unable to allocate memory for growing gap");
+    default: return janet_wrap_false();
+  }
 
   return janet_wrap_false();
 }
@@ -240,7 +248,14 @@ cfun_insert_string(int32_t argc, Janet *argv) {
 
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   const char *str = janet_getcstring(argv, 1);
+  int32_t result = insert_string(vp, str);
+  switch (result) {
+    case 1: return janet_wrap_true();
+    case -1: janet_panic("Unable to allocate memory for growing gap");
+    default: return janet_wrap_false();
+  }
 
+  return janet_wrap_false();
   if (insert_string(vp, str))
     return janet_wrap_true();
 
@@ -369,7 +384,7 @@ cfun_get_string(int32_t argc, Janet *argv) {
   janet_fixarity(argc, 1);
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   const char *str = (char*)get_text(vp);
-  return janet_wrap_string(janet_cstring(str)); 
+  return janet_wrap_string(janet_cstring(str));
 }
 
 static Janet
@@ -378,6 +393,24 @@ cfun_destroy(int32_t argc, Janet *argv) {
   VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
   destroy(vp);
   return janet_wrap_true();
+}
+
+static Janet
+cfun_line_stats(int32_t argc, Janet *argv) {
+  janet_fixarity(argc, 1);
+  VoidPad *vp = janet_getabstract(argv, 0, &voidpad_t);
+
+  int32_t *currentline = malloc(sizeof(int32_t));
+  int32_t *lastline = malloc(sizeof(int32_t));
+  get_line_stats(vp, currentline, lastline);
+
+  JanetArray *ja = janet_array(2);
+  janet_array_push(ja, janet_wrap_integer(*currentline));
+  janet_array_push(ja, janet_wrap_integer(*lastline));
+
+  free(currentline);
+  free(lastline);
+  return janet_wrap_array(ja);
 }
 
 int
@@ -407,6 +440,7 @@ static const JanetMethod get_methods[] = {
   {"bobp", cfun_beginning_of_buffer},
   {"eobp", cfun_end_of_buffer},
   {"to-string", cfun_get_string},
+  {"line-stats", cfun_line_stats},
   {NULL, NULL}
 };
 
@@ -478,6 +512,7 @@ static JanetReg cfuns[] = {
   {"beginning-of-line", cfun_bol, "Move point to beginning of current line"},
   {"end-of-line", cfun_eol, "Move point to end of current line"},
   {"to-string", cfun_get_string, "Return a string representing the text"},
+  {"line-stats", cfun_line_stats, "Return current line stats"},
   {NULL, NULL, NULL}
 };
 

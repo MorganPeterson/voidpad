@@ -1,3 +1,7 @@
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+
 #include "buffer.h"
 #include "queries.h"
 
@@ -21,15 +25,15 @@ grow_gap(VoidPad *vp, uint32_t n) {
   if (vp->size == 0) {
     newlen = n * sizeof(uint8_t);
     if (newlen < 0 || MAX_SIZE_T < newlen)
-      janet_panic("Failed to allocate memory");
-    new = janet_malloc((size_t)newlen);
+      return 0;
+    new = malloc((size_t)newlen);
     if (new == NULL)
-      janet_panic("Failed to allocate memory");
+      return 0;
   } else {
     newlen = (vp->size + n) * sizeof(uint8_t);
     if (newlen < 0 || MAX_SIZE_T < newlen)
       return 0;
-    new = janet_realloc(vp->buf, newlen);
+    new = realloc(vp->buf, newlen);
     if (new == NULL)
       return 0;
   }
@@ -46,7 +50,8 @@ voidpad_init(VoidPad *vp, const char *str){
   int32_t len = strlen(str);
   int32_t dfs = len + DEFAULT_SIZE;
 
-  grow_gap(vp, dfs);
+  if (!grow_gap(vp, dfs))
+    return 0;
   memcpy(vp->buf, str, len);
   memset(vp->buf + len, 0, DEFAULT_SIZE);
   vp->s = len;

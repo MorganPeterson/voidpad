@@ -60,6 +60,7 @@ Interface consists of:
 (beginning-of-line buf) # Move pointer to beginning of current line.
 (end-of-line buf)       # Move pointer to end of line.
 (to-string buf)         # Return entire buffer text as string.
+(line-stats buf n)      # Return array [currentline, lastline]
 ```
 
 See test/test.janet for more examples of usage.

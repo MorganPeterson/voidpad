@@ -9,7 +9,7 @@ int32_t
 insert_char(VoidPad *vp, int8_t c) {
   if ((vp->e - vp->s) < 4) {
     if (!grow_gap(vp, 4))
-      return 0;
+      return -1;
   }
   vp->buf[vp->s++] = c;
   return 1;
@@ -25,7 +25,7 @@ insert_string(VoidPad *vp, const char *s) {
     while (n + len > size)
       size <<= 1;
     if(!grow_gap(vp, size))
-      return 0;
+      return -1;
   }
   memcpy(vp->buf + vp->s, s, len);
   vp->s += len;
