@@ -45,24 +45,16 @@ grow_gap(VoidPad *vp, uint32_t n) {
 }
 
 VoidPad *
-voidpad_init(const char_t *str){
+voidpad_init(void){
   VoidPad *vp = malloc(sizeof(VoidPad));
   vp->buf = NULL;
   vp->size = 0;
   vp->s = 0;
-  vp->e = 0;
+  vp->e = DEFAULT_SIZE;
 
-  int32_t len = 0;
-  while (str[len++] != '\0');
-
-  int32_t dfs = len + DEFAULT_SIZE;
-
-  if (!grow_gap(vp, dfs))
+  if (!grow_gap(vp, DEFAULT_SIZE))
     return 0;
-  memcpy(vp->buf, str, len);
-  memset(vp->buf + len, 0, DEFAULT_SIZE);
-  vp->s = len;
-  vp->e = dfs;
+  memset(vp->buf, 0, DEFAULT_SIZE);
   return vp;
 }
 
