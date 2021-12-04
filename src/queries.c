@@ -84,33 +84,33 @@ get_beginning_of_next_line(VoidPad *vp, register int32_t offset) {
   return offset;
 }
 
-char_t
+char_t*
 char_after_pointer(VoidPad *vp) {
   int32_t pnt = vp->e;
   if (pnt < vp->size)
-    return vp->buf[pnt];
+    return &vp->buf[pnt];
   else
-    return vp->buf[vp->size - 1];
+    return &vp->buf[vp->size - 1];
 }
 
-char_t
+char_t*
 char_before_pointer(VoidPad *vp) {
   int32_t pnt = vp->s - 1;
   if (pnt > -1) {
-    return vp->buf[pnt];
+    return &vp->buf[pnt];
   } else {
-    return vp->buf[0];
+    return &vp->buf[0];
   }
 }
 
-char_t
+char_t*
 char_at_n(VoidPad *vp, uint32_t n) {
   if (n >= vp->s) {
     n += vp->e - vp->s;
     if (n >= vp->size)
       return '\0';
   }
-  return vp->buf[n];
+  return &vp->buf[n];
 }
 
 int32_t
