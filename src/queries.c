@@ -67,6 +67,23 @@ get_end_of_line(VoidPad *vp, register int32_t offset) {
   return offset;
 }
 
+int32_t
+get_beginning_of_next_line(VoidPad *vp, register int32_t offset) {
+  int32_t os = offset;
+  int32_t gs;
+  int32_t off_gs;
+  if ((os = get_end_of_line(vp, os))) {
+    gs = get_gap_size(vp);
+    off_gs = os + gs;
+    if (off_gs < vp->size) {
+      return (os++);
+    } else if (os == vp->size) {
+      return os;
+    }
+  }
+  return offset;
+}
+
 uint8_t
 char_after_pointer(VoidPad *vp) {
   int32_t pnt = vp->e;
