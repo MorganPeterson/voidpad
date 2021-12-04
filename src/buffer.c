@@ -28,7 +28,6 @@ grow_gap(VoidPad *vp, uint32_t n) {
     new = malloc((size_t)newlen);
     if (new == NULL)
       return 0;
-    vp->e = newlen-1;
   } else {
     newlen = (vp->size + n) * sizeof(char_t);
     if (newlen < 0 || MAX_SIZE_T < newlen)
@@ -37,10 +36,10 @@ grow_gap(VoidPad *vp, uint32_t n) {
     if (new == NULL)
       return 0;
   }
-  memmove(new + newlen - oldlen, new + vp->e, oldlen);
+  vp->e = vp->e + n;
   vp->buf = new;
   vp->size = newlen;
-  vp->e = vp->e + n;
+  memmove(new + newlen - oldlen, new + vp->e, oldlen);
   memset(vp->buf+vp->s, 0, vp->e - vp->s);
   return 1;
 }
