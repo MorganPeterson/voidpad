@@ -22,7 +22,7 @@ typedef struct voidpad {
 
 /* buffer */
 SO_IMPORT int32_t grow_gap(VoidPad*, uint32_t);
-SO_IMPORT int32_t voidpad_init(VoidPad*, const char_t*);
+SO_IMPORT VoidPad *voidpad_init(const char_t*);
 SO_IMPORT void destroy(VoidPad*);
 
 /* queries */
