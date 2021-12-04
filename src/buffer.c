@@ -47,8 +47,7 @@ grow_gap(VoidPad *vp, uint32_t n) {
 int32_t
 voidpad_init(VoidPad *vp, const char_t *str){
   int32_t len = 0;
-  while (str[len] != '\0')
-    len++;
+  while (str[len++] != '\0');
 
   int32_t dfs = len + DEFAULT_SIZE;
 

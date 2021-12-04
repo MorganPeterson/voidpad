@@ -16,8 +16,7 @@ insert_char(VoidPad *vp, char_t c) {
 int32_t
 insert_string(VoidPad *vp, const char_t *s) {
   int32_t len = 0;
-  while (s[len] != '\0')
-    len++;
+  while (s[len++] != '\0');
 
   int32_t gps = vp->e - vp->s;
   if (len >= gps) {
