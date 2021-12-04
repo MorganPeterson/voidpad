@@ -25,10 +25,10 @@ get_beginning_of_line(VoidPad *vp, register int32_t offset) {
   int32_t gs = get_gap_size(vp);
   int32_t off_gs = offset + gs;
 
-  if (offset < 0 || off_gs > vp->size)
-    return 0;
-
   while (offset > 0) {
+    if (offset < 0 || off_gs >= vp->size)
+      return 0;
+
     if (offset < vp->s) {
       if (vp->buf[offset] == '\n') {
         offset++;
