@@ -22,14 +22,14 @@ grow_gap(VoidPad *vp, uint32_t n) {
   n = n < MIN_GAP_EXPAND ? MIN_GAP_EXPAND : n;
 
   if (vp->size == 0) {
-    newlen = n * sizeof(uint8_t);
+    newlen = n * sizeof(char_t);
     if (newlen < 0 || MAX_SIZE_T < newlen)
       return 0;
     new = malloc((size_t)newlen);
     if (new == NULL)
       return 0;
   } else {
-    newlen = (vp->size + n) * sizeof(uint8_t);
+    newlen = (vp->size + n) * sizeof(char_t);
     if (newlen < 0 || MAX_SIZE_T < newlen)
       return 0;
     new = realloc(vp->buf, newlen);
@@ -45,8 +45,11 @@ grow_gap(VoidPad *vp, uint32_t n) {
 }
 
 int32_t
-voidpad_init(VoidPad *vp, const char *str){
-  int32_t len = strlen(str);
+voidpad_init(VoidPad *vp, const char_t *str){
+  int32_t len = 0;
+  while (str[len] != '\0')
+    len++;
+
   int32_t dfs = len + DEFAULT_SIZE;
 
   if (!grow_gap(vp, dfs))

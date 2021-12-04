@@ -4,7 +4,7 @@
 #include "voidpad.h"
 
 int32_t
-insert_char(VoidPad *vp, int8_t c) {
+insert_char(VoidPad *vp, char_t c) {
   if ((vp->e - vp->s) < 4) {
     if (!grow_gap(vp, 4))
       return -1;
@@ -14,8 +14,11 @@ insert_char(VoidPad *vp, int8_t c) {
 }
 
 int32_t
-insert_string(VoidPad *vp, const char *s) {
-  int32_t len = strlen(s);
+insert_string(VoidPad *vp, const char_t *s) {
+  int32_t len = 0;
+  while (s[len] != '\0')
+    len++;
+
   int32_t gps = vp->e - vp->s;
   if (len >= gps) {
     int32_t size = vp->size << 1;
@@ -66,7 +69,7 @@ delete_region(VoidPad *vp, int32_t beg, int32_t end) {
 
 int32_t
 erase_buf(VoidPad *vp) {
-  memset(vp->buf, 0, vp->size * sizeof(uint8_t));
+  memset(vp->buf, 0, vp->size * sizeof(char_t));
   vp->e = vp->size;
   vp->s = 0;
   return 1;

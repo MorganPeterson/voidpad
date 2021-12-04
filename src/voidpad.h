@@ -12,17 +12,17 @@
 extern "C" {
 #endif
 
-struct voidpad {
-  uint8_t *buf;  /* the buffer */
+typedef unsigned char char_t;
+
+typedef struct voidpad {
+  char_t *buf;  /* the buffer */
   int32_t size;  /* size allocated for buf */
   int32_t s, e; /* start and end of gap buffer */
-};
-
-typedef struct voidpad VoidPad;
+} VoidPad;
 
 /* buffer */
 SO_IMPORT int32_t grow_gap(VoidPad*, uint32_t);
-SO_IMPORT int32_t voidpad_init(VoidPad*, const char*);
+SO_IMPORT int32_t voidpad_init(VoidPad*, const char_t*);
 SO_IMPORT void destroy(VoidPad*);
 
 /* queries */
@@ -47,8 +47,8 @@ SO_IMPORT uint8_t *get_text(VoidPad*);
 SO_IMPORT void get_line_stats(VoidPad*, int32_t*, int32_t*);
 
 /* munging */
-SO_IMPORT int32_t insert_char(VoidPad*, int8_t);
-SO_IMPORT int32_t insert_string(VoidPad*, const char*);
+SO_IMPORT int32_t insert_char(VoidPad*, char_t);
+SO_IMPORT int32_t insert_string(VoidPad*, const char_t*);
 SO_IMPORT int32_t backspace_char(VoidPad*);
 SO_IMPORT int32_t delete_char(VoidPad*);
 SO_IMPORT int32_t delete_region(VoidPad*, int32_t, int32_t);
