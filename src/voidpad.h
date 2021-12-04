@@ -26,13 +26,8 @@ SO_IMPORT VoidPad *voidpad_init(void);
 SO_IMPORT void destroy(VoidPad*);
 
 /* queries */
-SO_IMPORT int32_t get_point(VoidPad*);
-SO_IMPORT int32_t get_point_min(VoidPad*);
 SO_IMPORT int32_t get_point_max(VoidPad*);
-SO_IMPORT int32_t get_aft_offset(VoidPad*);
-SO_IMPORT int32_t get_gap_offset(VoidPad*);
 SO_IMPORT int32_t get_gap_size(VoidPad*);
-SO_IMPORT int32_t get_all_size(VoidPad*);
 SO_IMPORT int32_t get_beginning_of_line(VoidPad*, register int32_t);
 SO_IMPORT int32_t get_end_of_line(VoidPad*, register int32_t);
 SO_IMPORT int32_t get_usr_size(VoidPad*);
@@ -43,7 +38,6 @@ SO_IMPORT int32_t beginning_of_line(VoidPad*);
 SO_IMPORT int32_t end_of_line(VoidPad*);
 SO_IMPORT int32_t beginning_of_buffer(VoidPad*);
 SO_IMPORT int32_t end_of_buffer(VoidPad*);
-SO_IMPORT uint8_t *get_text(VoidPad*);
 SO_IMPORT void get_line_stats(VoidPad*, int32_t*, int32_t*);
 
 /* munging */

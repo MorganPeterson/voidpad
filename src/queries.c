@@ -16,33 +16,8 @@ get_usr_size(VoidPad *vp) {
 }
 
 int32_t
-get_point(VoidPad *vp) {
-  return vp->s;
-}
-
-int32_t
-get_point_min(VoidPad *vp) {
-  return 0;
-}
-
-int32_t
 get_point_max(VoidPad *vp) {
   return get_usr_size(vp);
-}
-
-int32_t
-get_aft_offset(VoidPad *vp) {
-  return vp->e;
-}
-
-int32_t
-get_gap_offset(VoidPad *vp) {
-  return vp->s;
-}
-
-int32_t
-get_all_size(VoidPad *vp) {
-  return vp->size;
 }
 
 int32_t
@@ -156,13 +131,6 @@ end_of_buffer(VoidPad *vp) {
   if (vp->e == vp->size)
     return 1;
   return 0;
-}
-
-uint8_t *
-get_text(VoidPad *vp) {
-  goto_eob(vp);
-  vp->buf[vp->s] = '\0';
-  return vp->buf;
 }
 
 void
