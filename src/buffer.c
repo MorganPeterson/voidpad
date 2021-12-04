@@ -15,7 +15,7 @@ destroy(VoidPad* vp) {
 
 int32_t
 grow_gap(VoidPad *vp, uint32_t n) {
-  uint8_t *new;
+  char_t *new;
   int32_t newlen;
   int32_t oldlen = vp->size - vp->e;
 
@@ -53,7 +53,7 @@ voidpad_init(void){
   vp->e = DEFAULT_SIZE;
 
   if (!grow_gap(vp, DEFAULT_SIZE))
-    return 0;
+    return NULL;
   memset(vp->buf, 0, DEFAULT_SIZE);
   return vp;
 }
