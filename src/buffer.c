@@ -28,6 +28,7 @@ grow_gap(VoidPad *vp, uint32_t n) {
     new = malloc((size_t)newlen);
     if (new == NULL)
       return 0;
+    vp->e = newlen-1;
   } else {
     newlen = (vp->size + n) * sizeof(char_t);
     if (newlen < 0 || MAX_SIZE_T < newlen)
@@ -50,7 +51,7 @@ voidpad_init(void){
   vp->buf = NULL;
   vp->size = 0;
   vp->s = 0;
-  vp->e = DEFAULT_SIZE;
+  vp->e = 0;
 
   if (!grow_gap(vp, DEFAULT_SIZE))
     return NULL;
