@@ -106,9 +106,9 @@ char_before_pointer(VoidPad *vp) {
 char_t*
 char_at_n(VoidPad *vp, uint32_t n) {
   if (n >= vp->s) {
-    n += vp->e - vp->s;
     if (n >= vp->size)
       return '\0';
+    n = vp->e + (n - vp->s);
   }
   return &vp->buf[n];
 }
