@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stddef.h>
 
 #include "voidpad.h"
 
@@ -107,7 +108,7 @@ char_t*
 char_at_n(VoidPad *vp, uint32_t n) {
   if (n >= vp->s) {
     if (n >= vp->size)
-      return '\0';
+      return NULL;
     n = vp->e + (n - vp->s);
   }
   return &vp->buf[n];
