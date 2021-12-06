@@ -29,6 +29,7 @@ SO_IMPORT void destroy(VoidPad*);
 SO_IMPORT int32_t get_point_max(VoidPad*);
 SO_IMPORT int32_t get_gap_size(VoidPad*);
 SO_IMPORT int32_t get_beginning_of_line(VoidPad*, register int32_t);
+SO_IMPORT int32_t get_beginning_of_next_line(VoidPad*, register int32_t);
 SO_IMPORT int32_t get_end_of_line(VoidPad*, register int32_t);
 SO_IMPORT int32_t get_usr_size(VoidPad*);
 SO_IMPORT char_t* char_after_pointer(VoidPad*);
