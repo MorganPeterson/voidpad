@@ -88,11 +88,11 @@ char_before_pointer(VoidPad *vp) {
 char_t*
 char_at_n(VoidPad *vp, register uint32_t n) {
   if (n < 0)
-    return &vp->buf[0];
+    return NULL;
 
   n += n < vp->s ? 0 : get_gap_size(vp);
   if (n >= vp->size)
-    return &vp->buf[vp->size - 1];
+    return NULL;
 
   return &vp->buf[n];
 }
