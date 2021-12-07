@@ -63,20 +63,20 @@ down_n_lines(VoidPad *vp, int32_t n) {
   int32_t c = 0, i = vp->s;
   if (vp->e == vp->size) return 1;
 
-  while(i > 0 && vp->buf[i-1] != NEWLINE) {
+  while(i > 0 && vp->buf[i-1] != '\n') {
     i--;
     c++;
   }
   i = vp->e;
   while(n > 0) {
-    if(vp->buf[i] == NEWLINE)
+    if(vp->buf[i] == '\n')
       n--;
     i++;
     if(i == vp->size)
       break;
   }
   while(c > 0 && i < vp->size) {
-    if(vp->buf[i] == NEWLINE)
+    if(vp->buf[i] == '\n')
       break;
     i++;
     c--;
@@ -87,18 +87,18 @@ down_n_lines(VoidPad *vp, int32_t n) {
 int32_t
 up_n_lines(VoidPad *vp, int32_t n) {
     int32_t c = 0, i = vp->s;
-    while(i > 0 && vp->buf[i-1] != NEWLINE) {
+    while(i > 0 && vp->buf[i-1] != '\n') {
         i--;
         c++;
     }
     if(i == 0)
         return 0;
     while(n > 0 && --i > 0) {
-        if(vp->buf[i-1] == NEWLINE)
+        if(vp->buf[i-1] == '\n')
             n--;
     }
     while(c > 0) {
-        if(vp->buf[i] == NEWLINE)
+        if(vp->buf[i] == '\n')
             break;
         i++;
         c--;
@@ -118,17 +118,22 @@ move_forward_line(VoidPad *vp, int32_t n) {
 
 int32_t
 goto_bol(VoidPad *vp) {
-  int32_t bol = get_beginning_of_line(vp, vp->s);
-  while (vp->s > 0 && vp->s > bol)
+  while (vp->s > 0) {
+    if (vp->buf[vp->s - 1] == '\n')
+      break;
     vp->buf[--vp->e] = vp->buf[--vp->s];
+  }
   return 1;
 }
 
 int32_t
 goto_eol(VoidPad *vp) {
-  int32_t eol = get_end_of_line(vp, vp->s);
-  while (vp->e < vp->size && vp->s < eol)
+  while (vp->e < vp->size) {
+    if (vp->buf[vp->e] == '\n') {
+      break;
+    }
     vp->buf[vp->s++] = vp->buf[vp->e++];
+  }
   return 1;
 }
 
