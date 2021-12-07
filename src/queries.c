@@ -3,8 +3,6 @@
 
 #include "voidpad.h"
 
-#define NEWLINE 0x0D
-
 int32_t
 get_gap_size(VoidPad *vp) {
   return vp->e - vp->s;
@@ -39,10 +37,10 @@ get_end_of_line(VoidPad *vp, register int32_t offset) {
 
   while (off_gs < vp->size) {
     if (offset < vp->s) {
-      if (vp->buf[offset] == '\n')
+      if (vp->buf[offset] == NEWLINE)
         break;
     } else {
-      if (vp->buf[off_gs] == '\n')
+      if (vp->buf[off_gs] == NEWLINE)
         break;
     }
     offset++;
@@ -143,11 +141,11 @@ get_line_stats(VoidPad *vp, int32_t *cur, int32_t *last) {
 
   *cur = -1;
   for (int i=0; i < vp->size; i++) {
-    line += vp->buf[i] == '\n' ? 1 : 0;
+    line += vp->buf[i] == NEWLINE ? 1 : 0;
     *last = line;
 
     if (*cur == -1 && i == vp->s) {
-      *cur = vp->buf[i] == '\n' ? line : line + 1;
+      *cur = vp->buf[i] == NEWLINE ? line : line + 1;
     }
   }
   *last += 1;

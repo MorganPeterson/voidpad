@@ -12,6 +12,8 @@
 extern "C" {
 #endif
 
+#define NEWLINE 0x0A
+
 typedef unsigned char char_t;
 
 typedef struct voidpad {
