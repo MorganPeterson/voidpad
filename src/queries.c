@@ -23,28 +23,11 @@ get_point_max(VoidPad *vp) {
 
 int32_t
 get_beginning_of_line(VoidPad *vp, register int32_t offset) {
-  int32_t gs = get_gap_size(vp);
-  int32_t off_gs = offset + gs;
-
-  while (offset > 0) {
-    if (offset < 0 || off_gs >= vp->size)
-      return 0;
-
-    if (offset < vp->s) {
-      if (vp->buf[offset] == '\n') {
-        offset++;
-        break;
-      }
-    } else {
-      if (vp->buf[off_gs] == '\n') {
-        offset++;
-        break;
-      }
-    }
-    offset--;
-    off_gs--;
-  }
-  return offset;
+  register char_t *p;
+  do {
+    p = char_at_n(vp, offset--);
+  } while (0 < offset && *p != '\n');
+  return (0 < offset ? ++offset : 0);
 }
 
 int32_t
