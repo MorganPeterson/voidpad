@@ -118,22 +118,17 @@ move_forward_line(VoidPad *vp, int32_t n) {
 
 int32_t
 goto_bol(VoidPad *vp) {
-  while (vp->s > 0) {
-    if (vp->buf[vp->s - 1] == NEWLINE)
-      break;
+  int32_t bol = get_beginning_of_line(vp, vp->s);
+  while (vp->s > 0 && vp->s > bol)
     vp->buf[--vp->e] = vp->buf[--vp->s];
-  }
   return 1;
 }
 
 int32_t
 goto_eol(VoidPad *vp) {
-  while (vp->e < vp->size) {
-    if (vp->buf[vp->e] == '\n') {
-      break;
-    }
+  int32_t eol = get_end_of_line(vp, vp->s);
+  while (vp->e < vp->size && vp->s < eol)
     vp->buf[vp->s++] = vp->buf[vp->e++];
-  }
   return 1;
 }
 
