@@ -3,8 +3,6 @@
 
 #include "voidpad.h"
 
-#define NEWLINE 0x0D
-
 int32_t
 get_gap_size(VoidPad *vp) {
   return vp->e - vp->s;
