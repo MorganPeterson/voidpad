@@ -26,7 +26,7 @@ get_beginning_of_line(VoidPad *vp, register int32_t offset) {
   register char_t *p;
   do {
     p = char_at_n(vp, offset--);
-  } while (0 < offset && *p != '\n');
+  } while (0 < offset && *p != NEWLINE);
   return (0 < offset ? ++offset : 0);
 }
 
