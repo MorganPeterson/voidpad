@@ -119,7 +119,8 @@ move_forward_line(VoidPad *vp, int32_t n) {
 int32_t
 goto_bol(VoidPad *vp) {
   int32_t bol = get_beginning_of_line(vp, vp->s);
-  while (vp->s > 0 && vp->s > bol)
+  bol -= bol > 0 ? 1 : 0;
+  while (0 < vp->s && vp->s > bol)
     vp->buf[--vp->e] = vp->buf[--vp->s];
   return 1;
 }

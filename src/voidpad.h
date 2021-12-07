@@ -12,6 +12,10 @@
 extern "C" {
 #endif
 
+#define DEFAULT_SIZE 4
+#define MIN_GAP_EXPAND 4
+#define MAX_SIZE_T ((unsigned long) (size_t) ~0)
+
 #define NEWLINE 0x0D
 
 typedef unsigned char char_t;

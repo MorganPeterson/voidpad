@@ -5,8 +5,8 @@
 
 int32_t
 insert_char(VoidPad *vp, char_t c) {
-  if ((vp->e - vp->s) < 4) {
-    if (!grow_gap(vp, 4))
+  if ((vp->e - vp->s) < DEFAULT_SIZE) {
+    if (!grow_gap(vp, MIN_GAP_EXPAND))
       return -1;
   }
   vp->buf[vp->s++] = c;
